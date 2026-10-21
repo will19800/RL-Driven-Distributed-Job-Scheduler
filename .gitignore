@@ -27,6 +27,20 @@ go.work.sum
 # env file
 .env
 
+# Python bytecode and tool caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Python virtual environments and package output
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+
 # Editor/IDE
 # .idea/
 # .vscode/
