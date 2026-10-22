@@ -41,6 +41,10 @@ dist/
 build/
 *.egg-info/
 
+# Local project build and cache output
+/bin/
+/.cache/
+
 # Editor/IDE
 # .idea/
 # .vscode/
