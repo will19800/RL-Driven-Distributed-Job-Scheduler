@@ -16,7 +16,7 @@ export PYTHONPATH
 
 .DEFAULT_GOAL := help
 
-.PHONY: help fmt fmt-check lint test test-go test-python build \
+.PHONY: help fmt fmt-check docs-check lint test test-go test-python build \
 	train-smoke benchmark-smoke clean
 
 help: ## Show available development commands.
@@ -33,8 +33,12 @@ fmt-check: ## Fail if Go source files need formatting.
 		exit 1; \
 	fi
 
-lint: fmt-check ## Run dependency-free static checks.
+docs-check: ## Validate Markdown formatting and local links.
+	$(PYTHON) scripts/check_docs.py
+
+lint: fmt-check docs-check ## Run dependency-free static checks.
 	$(GO) vet ./...
+	$(GO) mod tidy -diff
 	$(PYTHON) -m compileall -q python/scheduler_rl python/tests
 	$(PYTHON) -c 'import pathlib, tomllib; tomllib.loads(pathlib.Path("python/pyproject.toml").read_text())'
 
