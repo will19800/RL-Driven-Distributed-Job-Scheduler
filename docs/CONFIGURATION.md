@@ -9,7 +9,7 @@ The root fields are:
 - `schema_version`: required and currently must be `v1`.
 - `seed`: signed 64-bit seed reserved for deterministic workload streams.
 - `cluster.nodes`: one or more initially empty and available nodes.
-- `workload.jobs`: one or more explicit queued jobs.
+- `workload`: exactly one of `jobs` or `synthetic`.
 
 Resources use integer units:
 
@@ -24,3 +24,16 @@ values are rejected because their unit would be ambiguous.
 
 See [`configs/experiments/smoke.yaml`](../configs/experiments/smoke.yaml) for a
 complete configuration that is validated in the test suite.
+
+## Synthetic workloads
+
+`workload.synthetic` generates deterministic jobs from the root `seed`. It
+requires a job `count`, `start_time`, positive `arrival_rate_per_second`, a
+bounded log-normal `duration`, and one or more weighted resource `profiles`.
+The generator currently limits a configuration to 100,000 jobs.
+
+Arrival, duration, and profile choices use independently derived random streams.
+Changing a resource-profile mix therefore does not change arrival timestamps or
+durations for the same seed. See
+[`configs/experiments/synthetic-smoke.yaml`](../configs/experiments/synthetic-smoke.yaml)
+for a complete example.

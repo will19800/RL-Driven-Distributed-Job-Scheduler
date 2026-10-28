@@ -1,0 +1,54 @@
+schema_version: v1
+seed: 42
+
+cluster:
+  nodes:
+    - id: node-general-1
+      type: general
+      capacity:
+        cpu_millis: 8000
+        memory_mib: 16384
+        gpus: 0
+        ephemeral_disk_mib: 51200
+    - id: node-gpu-1
+      type: gpu
+      capacity:
+        cpu_millis: 16000
+        memory_mib: 65536
+        gpus: 4
+        ephemeral_disk_mib: 204800
+
+workload:
+  synthetic:
+    count: 100
+    start_time: 0s
+    arrival_rate_per_second: 5
+    duration:
+      median: 5s
+      sigma: 0.6
+      min: 500ms
+      max: 30s
+    profiles:
+      - name: balanced
+        weight: 5
+        resources:
+          cpu_millis: 1000
+          memory_mib: 2048
+          gpus: 0
+          ephemeral_disk_mib: 1024
+      - name: memory-heavy
+        weight: 3
+        resources:
+          cpu_millis: 500
+          memory_mib: 8192
+          gpus: 0
+          ephemeral_disk_mib: 2048
+        priority: 1
+      - name: gpu
+        weight: 1
+        resources:
+          cpu_millis: 2000
+          memory_mib: 8192
+          gpus: 1
+          ephemeral_disk_mib: 4096
+        priority: 2

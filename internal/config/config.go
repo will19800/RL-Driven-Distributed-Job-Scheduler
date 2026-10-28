@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/domain"
+	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/workload"
 	"gopkg.in/yaml.v3"
 )
 
@@ -65,10 +66,10 @@ type NodeConfig struct {
 	Capacity domain.ResourceVector `yaml:"capacity"`
 }
 
-// WorkloadConfig defines explicit jobs. Generated workloads are added in the
-// workload milestone without changing the v1 root contract.
+// WorkloadConfig selects exactly one explicit or synthetic workload source.
 type WorkloadConfig struct {
-	Jobs []JobConfig `yaml:"jobs"`
+	Jobs      []JobConfig              `yaml:"jobs,omitempty"`
+	Synthetic *SyntheticWorkloadConfig `yaml:"synthetic,omitempty"`
 }
 
 // JobConfig defines one queued, non-preemptive job.
@@ -79,6 +80,31 @@ type JobConfig struct {
 	Duration   Duration              `yaml:"duration"`
 	Priority   int32                 `yaml:"priority,omitempty"`
 	Deadline   *Duration             `yaml:"deadline,omitempty"`
+}
+
+// SyntheticWorkloadConfig defines a seeded synthetic workload.
+type SyntheticWorkloadConfig struct {
+	Count                int                     `yaml:"count"`
+	StartTime            Duration                `yaml:"start_time"`
+	ArrivalRatePerSecond float64                 `yaml:"arrival_rate_per_second"`
+	Duration             SyntheticDurationConfig `yaml:"duration"`
+	Profiles             []ResourceProfileConfig `yaml:"profiles"`
+}
+
+// SyntheticDurationConfig defines a bounded log-normal distribution.
+type SyntheticDurationConfig struct {
+	Median Duration `yaml:"median"`
+	Sigma  float64  `yaml:"sigma"`
+	Min    Duration `yaml:"min"`
+	Max    Duration `yaml:"max"`
+}
+
+// ResourceProfileConfig defines one weighted synthetic job shape.
+type ResourceProfileConfig struct {
+	Name      string                `yaml:"name"`
+	Weight    float64               `yaml:"weight"`
+	Resources domain.ResourceVector `yaml:"resources"`
+	Priority  int32                 `yaml:"priority,omitempty"`
 }
 
 // Load reads and decodes one configuration file.
@@ -140,8 +166,10 @@ func (c Config) DomainValues() ([]domain.Node, []domain.Job, error) {
 	if len(c.Cluster.Nodes) == 0 {
 		return nil, nil, fmt.Errorf("%w: cluster.nodes must not be empty", ErrInvalidConfig)
 	}
-	if len(c.Workload.Jobs) == 0 {
-		return nil, nil, fmt.Errorf("%w: workload.jobs must not be empty", ErrInvalidConfig)
+	hasExplicitJobs := len(c.Workload.Jobs) > 0
+	hasSyntheticJobs := c.Workload.Synthetic != nil
+	if hasExplicitJobs == hasSyntheticJobs {
+		return nil, nil, fmt.Errorf("%w: workload must define exactly one of jobs or synthetic", ErrInvalidConfig)
 	}
 
 	nodes := make([]domain.Node, 0, len(c.Cluster.Nodes))
@@ -162,6 +190,15 @@ func (c Config) DomainValues() ([]domain.Node, []domain.Job, error) {
 		}
 		nodeIDs[node.ID] = struct{}{}
 		nodes = append(nodes, node)
+	}
+
+	if c.Workload.Synthetic != nil {
+		spec := syntheticSpec(*c.Workload.Synthetic)
+		jobs, err := workload.Generate(c.Seed, spec)
+		if err != nil {
+			return nil, nil, fmt.Errorf("%w: workload.synthetic: %v", ErrInvalidConfig, err)
+		}
+		return nodes, jobs, nil
 	}
 
 	jobs := make([]domain.Job, 0, len(c.Workload.Jobs))
@@ -189,6 +226,30 @@ func (c Config) DomainValues() ([]domain.Node, []domain.Job, error) {
 		jobs = append(jobs, job)
 	}
 	return nodes, jobs, nil
+}
+
+func syntheticSpec(input SyntheticWorkloadConfig) workload.Spec {
+	profiles := make([]workload.ResourceProfile, 0, len(input.Profiles))
+	for _, profile := range input.Profiles {
+		profiles = append(profiles, workload.ResourceProfile{
+			Name:      profile.Name,
+			Weight:    profile.Weight,
+			Resources: profile.Resources,
+			Priority:  profile.Priority,
+		})
+	}
+	return workload.Spec{
+		Count:                input.Count,
+		StartTime:            input.StartTime.Duration,
+		ArrivalRatePerSecond: input.ArrivalRatePerSecond,
+		Duration: workload.DurationSpec{
+			Median: input.Duration.Median.Duration,
+			Sigma:  input.Duration.Sigma,
+			Min:    input.Duration.Min.Duration,
+			Max:    input.Duration.Max.Duration,
+		},
+		Profiles: profiles,
+	}
 }
 
 func cloneLabels(labels map[string]string) map[string]string {

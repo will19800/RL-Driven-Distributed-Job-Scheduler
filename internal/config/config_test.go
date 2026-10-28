@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -80,6 +81,26 @@ func TestLoadSmokeConfiguration(t *testing.T) {
 	}
 }
 
+func TestLoadSyntheticConfigurationDeterministically(t *testing.T) {
+	t.Parallel()
+	path := filepath.Join("..", "..", "configs", "experiments", "synthetic-smoke.yaml")
+	configuration, err := Load(path)
+	if err != nil {
+		t.Fatalf("Load(%q) unexpected error: %v", path, err)
+	}
+	_, first, err := configuration.DomainValues()
+	if err != nil {
+		t.Fatalf("DomainValues(first) unexpected error: %v", err)
+	}
+	_, second, err := configuration.DomainValues()
+	if err != nil {
+		t.Fatalf("DomainValues(second) unexpected error: %v", err)
+	}
+	if len(first) != 100 || !reflect.DeepEqual(first, second) {
+		t.Fatalf("synthetic workload was not a deterministic 100-job sequence")
+	}
+}
+
 func TestDecodeRejectsUnknownFieldsAtEveryLevel(t *testing.T) {
 	t.Parallel()
 	tests := map[string]string{
@@ -131,6 +152,9 @@ func TestValidateRejectsDuplicateIDsAndEmptyCollections(t *testing.T) {
 		"duplicate job":  func(c *Config) { c.Workload.Jobs = append(c.Workload.Jobs, c.Workload.Jobs[0]) },
 		"no nodes":       func(c *Config) { c.Cluster.Nodes = nil },
 		"no jobs":        func(c *Config) { c.Workload.Jobs = nil },
+		"both workload sources": func(c *Config) {
+			c.Workload.Synthetic = &SyntheticWorkloadConfig{}
+		},
 	}
 	for name, mutate := range tests {
 		t.Run(name, func(t *testing.T) {
@@ -143,6 +167,27 @@ func TestValidateRejectsDuplicateIDsAndEmptyCollections(t *testing.T) {
 				t.Fatalf("Validate() error = %v, want ErrInvalidConfig", err)
 			}
 		})
+	}
+}
+
+func TestValidateRejectsInvalidSyntheticWorkload(t *testing.T) {
+	t.Parallel()
+	configuration, err := Decode(strings.NewReader(validYAML()))
+	if err != nil {
+		t.Fatalf("Decode() unexpected error: %v", err)
+	}
+	configuration.Workload.Jobs = nil
+	configuration.Workload.Synthetic = &SyntheticWorkloadConfig{
+		Count:                1,
+		ArrivalRatePerSecond: 1,
+		Duration: SyntheticDurationConfig{
+			Median: Duration{Duration: time.Second},
+			Min:    Duration{Duration: time.Second},
+			Max:    Duration{Duration: time.Second},
+		},
+	}
+	if err := configuration.Validate(); !errors.Is(err, ErrInvalidConfig) {
+		t.Fatalf("Validate() error = %v, want ErrInvalidConfig", err)
 	}
 }
 
