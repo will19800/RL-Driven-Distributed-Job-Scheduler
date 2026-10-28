@@ -1,0 +1,56 @@
+schema_version: v1
+seed: 42
+
+cluster:
+  nodes:
+    - id: node-general-1
+      type: general
+      labels:
+        zone: test-a
+      capacity:
+        cpu_millis: 4000
+        memory_mib: 8192
+        gpus: 0
+        ephemeral_disk_mib: 20480
+    - id: node-gpu-1
+      type: gpu
+      labels:
+        zone: test-b
+      capacity:
+        cpu_millis: 8000
+        memory_mib: 32768
+        gpus: 2
+        ephemeral_disk_mib: 102400
+
+workload:
+  jobs:
+    - id: job-small-cpu
+      submit_time: 0s
+      resources:
+        cpu_millis: 500
+        memory_mib: 512
+        gpus: 0
+        ephemeral_disk_mib: 100
+      duration: 2s
+      priority: 0
+      deadline: 10s
+    - id: job-memory
+      submit_time: 500ms
+      resources:
+        cpu_millis: 1000
+        memory_mib: 4096
+        gpus: 0
+        ephemeral_disk_mib: 1000
+      duration: 4s
+      priority: 1
+      deadline: 12s
+    - id: job-gpu
+      submit_time: 1s
+      resources:
+        cpu_millis: 2000
+        memory_mib: 8192
+        gpus: 1
+        ephemeral_disk_mib: 2048
+      duration: 5s
+      priority: 2
+      deadline: 15s

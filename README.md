@@ -10,7 +10,9 @@ utilization improvement are target hypotheses; no repository evidence currently
 validates those figures.
 
 See [the design and delivery plan](docs/PROJECT_DESIGN.md) for the architecture,
-milestones, validation rules, and ordered commit roadmap.
+milestones, validation rules, and ordered commit roadmap. The
+[configuration reference](docs/CONFIGURATION.md) documents the strict v1 YAML
+schema and links to the tested smoke configuration.
 
 ## Prerequisites
 

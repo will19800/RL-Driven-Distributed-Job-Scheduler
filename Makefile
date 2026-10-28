@@ -62,5 +62,6 @@ benchmark-smoke: ## Check that the simulator command starts.
 	$(GO) run ./cmd/scheduler-sim
 
 clean: ## Remove generated local build and cache artifacts.
+	$(GO) clean -modcache
 	rm -rf "$(BUILD_DIR)" "$(PROJECT_ROOT)/.cache"
 	find python -type d -name __pycache__ -prune -exec rm -rf {} +
