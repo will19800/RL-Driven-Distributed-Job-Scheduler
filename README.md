@@ -20,7 +20,28 @@ schema and links to the tested smoke configuration.
 - Python 3.12 or newer
 - Make
 
-The current project skeleton has no third-party runtime dependencies.
+Go dependencies are pinned in `go.mod` and `go.sum`. The Python package does
+not yet require third-party dependencies.
+
+## Project status
+
+| Milestone | Status |
+|---|---|
+| M0 — Truthful project foundation | Complete |
+| M1 — Deterministic simulator vertical slice | Complete |
+| M2 — Baseline scheduler suite | Next |
+| M3–M7 — Experiments, RL, evidence, and release | Planned |
+
+## Run the smoke simulation
+
+```bash
+go run ./cmd/scheduler-sim run --config configs/experiments/smoke.yaml
+```
+
+The command uses the temporary deterministic `first-fit` policy and writes a
+versioned JSON summary to standard output. Use `--output summary.json` to write
+the result to a file. Additional baseline policies and detailed metrics arrive
+in later milestones.
 
 ## Development commands
 

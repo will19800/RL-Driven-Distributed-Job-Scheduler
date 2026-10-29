@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"sort"
 	"time"
 
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/domain"
@@ -91,10 +92,23 @@ func (s *Simulation) Now() time.Duration { return s.clock.Now() }
 // PendingEvents returns the number of events waiting to be processed.
 func (s *Simulation) PendingEvents() int { return s.events.Len() }
 
+// NextEvent returns the next event without consuming it.
+func (s *Simulation) NextEvent() (Event, bool) { return s.events.Peek() }
+
 // Node returns a defensive copy of a node.
 func (s *Simulation) Node(id domain.NodeID) (domain.Node, bool) {
 	node, ok := s.nodes[id]
 	return cloneNode(node), ok
+}
+
+// Nodes returns defensive copies ordered by node ID.
+func (s *Simulation) Nodes() []domain.Node {
+	nodes := make([]domain.Node, 0, len(s.nodes))
+	for _, node := range s.nodes {
+		nodes = append(nodes, cloneNode(node))
+	}
+	sort.Slice(nodes, func(left, right int) bool { return nodes[left].ID < nodes[right].ID })
+	return nodes
 }
 
 // Job returns a defensive copy of an active or not-yet-submitted job.
@@ -104,6 +118,22 @@ func (s *Simulation) Job(id domain.JobID) (domain.Job, bool) {
 	}
 	job, ok := s.pending[id]
 	return cloneJob(job), ok
+}
+
+// Jobs returns defensive copies of submitted jobs ordered by submission time
+// and then job ID. Future jobs are omitted until their submission event runs.
+func (s *Simulation) Jobs() []domain.Job {
+	jobs := make([]domain.Job, 0, len(s.jobs))
+	for _, job := range s.jobs {
+		jobs = append(jobs, cloneJob(job))
+	}
+	sort.Slice(jobs, func(left, right int) bool {
+		if jobs[left].SubmitTime == jobs[right].SubmitTime {
+			return jobs[left].ID < jobs[right].ID
+		}
+		return jobs[left].SubmitTime < jobs[right].SubmitTime
+	})
+	return jobs
 }
 
 // SchedulePlacement schedules a start transition. Feasibility is checked when

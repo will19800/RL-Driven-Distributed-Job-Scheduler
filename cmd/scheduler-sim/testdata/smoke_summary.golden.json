@@ -1,0 +1,14 @@
+{
+  "schema_version": "v1",
+  "policy": "first-fit",
+  "seed": 42,
+  "simulation_time": "6s",
+  "node_count": 2,
+  "jobs": {
+    "total": 3,
+    "queued": 0,
+    "running": 0,
+    "completed": 3,
+    "rejected": 0
+  }
+}

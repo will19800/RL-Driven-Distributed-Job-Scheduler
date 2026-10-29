@@ -37,6 +37,10 @@ func TestSimulationProcessesJobLifecycleAndAccounting(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewSimulation() unexpected error: %v", err)
 	}
+	next, exists := simulation.NextEvent()
+	if !exists || next.Type != EventJobSubmitted || next.Time != 2*time.Second || simulation.PendingEvents() != 1 {
+		t.Fatalf("NextEvent() = %+v, %t; want submission at 2s", next, exists)
+	}
 	if _, err := simulation.SchedulePlacement(3*time.Second, domain.Placement{JobID: "job-1", NodeID: "node-1"}); err != nil {
 		t.Fatalf("SchedulePlacement() unexpected error: %v", err)
 	}
@@ -289,6 +293,40 @@ func TestSimulationAccessorsReturnDefensiveCopies(t *testing.T) {
 	storedJob, _ := simulation.Job("job-1")
 	if *storedJob.Deadline != 20*time.Second {
 		t.Fatal("Job() exposed mutable time pointer")
+	}
+}
+
+func TestSimulationCollectionAccessorsAreSortedAndDefensive(t *testing.T) {
+	t.Parallel()
+	secondNode := simulationNode()
+	secondNode.ID = "node-0"
+	secondJob := simulationJob()
+	secondJob.ID = "job-0"
+	secondJob.SubmitTime = time.Second
+	simulation, err := NewSimulation(
+		[]domain.Node{simulationNode(), secondNode},
+		[]domain.Job{simulationJob(), secondJob},
+	)
+	if err != nil {
+		t.Fatalf("NewSimulation() unexpected error: %v", err)
+	}
+	if err := simulation.Run(context.Background()); err != nil {
+		t.Fatalf("Run() unexpected error: %v", err)
+	}
+	nodes := simulation.Nodes()
+	if len(nodes) != 2 || nodes[0].ID != "node-0" || nodes[1].ID != "node-1" {
+		t.Fatalf("Nodes() = %+v, want node ID order", nodes)
+	}
+	jobs := simulation.Jobs()
+	if len(jobs) != 2 || jobs[0].ID != "job-0" || jobs[1].ID != "job-1" {
+		t.Fatalf("Jobs() = %+v, want submission order", jobs)
+	}
+	nodes[0].Labels["pool"] = "changed"
+	jobs[0].State = domain.JobStateRejected
+	storedNode, _ := simulation.Node("node-0")
+	storedJob, _ := simulation.Job("job-0")
+	if storedNode.Labels["pool"] != "default" || storedJob.State != domain.JobStateQueued {
+		t.Fatal("collection accessor exposed mutable state")
 	}
 }
 

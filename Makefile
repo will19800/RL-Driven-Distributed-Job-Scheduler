@@ -58,8 +58,8 @@ build: ## Build both Go command-line programs.
 train-smoke: ## Check that the Python training package starts.
 	$(PYTHON) -m scheduler_rl
 
-benchmark-smoke: ## Check that the simulator command starts.
-	$(GO) run ./cmd/scheduler-sim
+benchmark-smoke: ## Run the deterministic smoke simulation.
+	$(GO) run ./cmd/scheduler-sim run --config configs/experiments/smoke.yaml
 
 clean: ## Remove generated local build and cache artifacts.
 	$(GO) clean -modcache
