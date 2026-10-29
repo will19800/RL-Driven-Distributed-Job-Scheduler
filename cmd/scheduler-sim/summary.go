@@ -22,11 +22,11 @@ type jobSummary struct {
 	Rejected  int `json:"rejected"`
 }
 
-func buildSummary(seed int64, simulation *simulator.Simulation) resultSummary {
+func buildSummary(policy string, seed int64, simulation *simulator.Simulation) resultSummary {
 	jobs := simulation.Jobs()
 	summary := resultSummary{
 		SchemaVersion:  "v1",
-		Policy:         "first-fit",
+		Policy:         policy,
 		Seed:           seed,
 		SimulationTime: simulation.Now().String(),
 		NodeCount:      len(simulation.Nodes()),

@@ -61,6 +61,27 @@ func TestRunCLIWritesOutputFile(t *testing.T) {
 	}
 }
 
+func TestRunCLISupportsBaselinePolicies(t *testing.T) {
+	t.Parallel()
+	for _, policy := range []string{"round-robin", "random-fit"} {
+		t.Run(policy, func(t *testing.T) {
+			t.Parallel()
+			var stdout, stderr bytes.Buffer
+			code := runCLI(context.Background(), []string{"run", "--config", smokeConfigPath(), "--policy", policy}, &stdout, &stderr)
+			if code != 0 {
+				t.Fatalf("runCLI() code = %d, stderr = %s", code, stderr.String())
+			}
+			var summary resultSummary
+			if err := json.Unmarshal(stdout.Bytes(), &summary); err != nil {
+				t.Fatalf("summary is not valid JSON: %v", err)
+			}
+			if summary.Policy != policy || summary.Jobs.Completed != 3 {
+				t.Fatalf("summary = %+v, want policy %q and 3 completed jobs", summary, policy)
+			}
+		})
+	}
+}
+
 func TestRunCLIReturnsStructuredErrors(t *testing.T) {
 	t.Parallel()
 	tests := []struct {

@@ -11,13 +11,16 @@ import (
 
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/config"
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/domain"
+	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/policies"
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/scheduler"
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/simulator"
 )
 
 const usage = `Usage:
-  scheduler-sim run --config PATH [--output PATH] [--policy first-fit]
+  scheduler-sim run --config PATH [--output PATH] [--policy POLICY]
   scheduler-sim --version
+
+Policies: first-fit, round-robin, random-fit
 `
 
 type commandError struct {
@@ -72,10 +75,6 @@ func runCommand(ctx context.Context, args []string, stdout io.Writer) *commandEr
 	if flags.NArg() != 0 {
 		return newCommandError("usage", fmt.Errorf("unexpected arguments: %v", flags.Args()))
 	}
-	if *policy != "first-fit" {
-		return newCommandError("usage", fmt.Errorf("unsupported policy %q", *policy))
-	}
-
 	configuration, err := config.Load(*configPath)
 	if err != nil {
 		return newCommandError("config_load_failed", err)
@@ -88,10 +87,14 @@ func runCommand(ctx context.Context, args []string, stdout io.Writer) *commandEr
 	if err != nil {
 		return newCommandError("simulation_init_failed", err)
 	}
-	if err := runFirstFit(ctx, simulation); err != nil {
+	selectedPolicy, err := newPolicy(*policy, configuration.Seed)
+	if err != nil {
+		return newCommandError("usage", err)
+	}
+	if err := runSimulation(ctx, simulation, selectedPolicy); err != nil {
 		return newCommandError("simulation_failed", err)
 	}
-	encoded, err := json.MarshalIndent(buildSummary(configuration.Seed, simulation), "", "  ")
+	encoded, err := json.MarshalIndent(buildSummary(selectedPolicy.Name(), configuration.Seed, simulation), "", "  ")
 	if err != nil {
 		return newCommandError("result_encode_failed", err)
 	}
@@ -109,6 +112,10 @@ func runCommand(ctx context.Context, args []string, stdout io.Writer) *commandEr
 }
 
 func runFirstFit(ctx context.Context, simulation *simulator.Simulation) error {
+	return runSimulation(ctx, simulation, firstFitPolicy{})
+}
+
+func runSimulation(ctx context.Context, simulation *simulator.Simulation, policy scheduler.Policy) error {
 	for {
 		_, ok, err := simulation.RunNext(ctx)
 		if err != nil {
@@ -120,7 +127,7 @@ func runFirstFit(ctx context.Context, simulation *simulator.Simulation) error {
 		if next, exists := simulation.NextEvent(); exists && next.Time == simulation.Now() {
 			continue
 		}
-		if _, err := scheduleFirstFit(ctx, simulation); err != nil {
+		if _, err := schedule(ctx, simulation, policy); err != nil {
 			return err
 		}
 	}
@@ -145,12 +152,12 @@ func (firstFitPolicy) Decide(_ context.Context, snapshot scheduler.Snapshot) (sc
 	return scheduler.Decision{Defer: true}, nil
 }
 
-func scheduleFirstFit(ctx context.Context, simulation *simulator.Simulation) (bool, error) {
+func schedule(ctx context.Context, simulation *simulator.Simulation, policy scheduler.Policy) (bool, error) {
 	snapshot, err := scheduler.NewSnapshot(simulation.Now(), simulation.Nodes(), simulation.Jobs())
 	if err != nil {
 		return false, err
 	}
-	evaluation, err := scheduler.Evaluate(ctx, firstFitPolicy{}, snapshot)
+	evaluation, err := scheduler.Evaluate(ctx, policy, snapshot)
 	if err != nil {
 		return false, err
 	}
@@ -160,6 +167,19 @@ func scheduleFirstFit(ctx context.Context, simulation *simulator.Simulation) (bo
 		}
 	}
 	return len(evaluation.Decision.Placements) != 0, nil
+}
+
+func newPolicy(name string, seed int64) (scheduler.Policy, error) {
+	switch name {
+	case "first-fit":
+		return firstFitPolicy{}, nil
+	case "round-robin":
+		return policies.NewRoundRobin(), nil
+	case "random-fit":
+		return policies.NewRandomFit(seed), nil
+	default:
+		return nil, fmt.Errorf("unsupported policy %q", name)
+	}
 }
 
 func newCommandError(code string, err error) *commandError {
