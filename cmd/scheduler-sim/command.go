@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"sort"
 
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/config"
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/domain"
+	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/scheduler"
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/simulator"
 )
 
@@ -120,36 +120,46 @@ func runFirstFit(ctx context.Context, simulation *simulator.Simulation) error {
 		if next, exists := simulation.NextEvent(); exists && next.Time == simulation.Now() {
 			continue
 		}
-		if _, err := scheduleFirstFit(simulation); err != nil {
+		if _, err := scheduleFirstFit(ctx, simulation); err != nil {
 			return err
 		}
 	}
 }
 
-func scheduleFirstFit(simulation *simulator.Simulation) (bool, error) {
-	jobs := simulation.Jobs()
-	sort.SliceStable(jobs, func(left, right int) bool {
-		if jobs[left].Priority == jobs[right].Priority {
-			if jobs[left].SubmitTime == jobs[right].SubmitTime {
-				return jobs[left].ID < jobs[right].ID
-			}
-			return jobs[left].SubmitTime < jobs[right].SubmitTime
-		}
-		return jobs[left].Priority > jobs[right].Priority
-	})
-	for _, job := range jobs {
+type firstFitPolicy struct{}
+
+func (firstFitPolicy) Name() string { return "first-fit" }
+
+func (firstFitPolicy) Decide(_ context.Context, snapshot scheduler.Snapshot) (scheduler.Decision, error) {
+	for _, job := range snapshot.Jobs() {
 		if job.State != domain.JobStateQueued {
 			continue
 		}
-		for _, node := range simulation.Nodes() {
+		for _, node := range snapshot.Nodes() {
 			if !node.CanFit(job.Request) {
 				continue
 			}
-			_, err := simulation.SchedulePlacement(simulation.Now(), domain.Placement{JobID: job.ID, NodeID: node.ID})
-			return err == nil, err
+			return scheduler.Decision{Placements: []domain.Placement{{JobID: job.ID, NodeID: node.ID}}}, nil
 		}
 	}
-	return false, nil
+	return scheduler.Decision{Defer: true}, nil
+}
+
+func scheduleFirstFit(ctx context.Context, simulation *simulator.Simulation) (bool, error) {
+	snapshot, err := scheduler.NewSnapshot(simulation.Now(), simulation.Nodes(), simulation.Jobs())
+	if err != nil {
+		return false, err
+	}
+	evaluation, err := scheduler.Evaluate(ctx, firstFitPolicy{}, snapshot)
+	if err != nil {
+		return false, err
+	}
+	for _, placement := range evaluation.Decision.Placements {
+		if _, err := simulation.SchedulePlacement(simulation.Now(), placement); err != nil {
+			return false, err
+		}
+	}
+	return len(evaluation.Decision.Placements) != 0, nil
 }
 
 func newCommandError(code string, err error) *commandError {
