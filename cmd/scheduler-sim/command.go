@@ -20,7 +20,7 @@ const usage = `Usage:
   scheduler-sim run --config PATH [--output PATH] [--policy POLICY]
   scheduler-sim --version
 
-Policies: first-fit, round-robin, random-fit
+Policies: first-fit, round-robin, random-fit, least-loaded, bin-pack
 `
 
 type commandError struct {
@@ -177,6 +177,10 @@ func newPolicy(name string, seed int64) (scheduler.Policy, error) {
 		return policies.NewRoundRobin(), nil
 	case "random-fit":
 		return policies.NewRandomFit(seed), nil
+	case "least-loaded":
+		return policies.NewLeastLoaded(), nil
+	case "bin-pack", "binpack":
+		return policies.NewBinPack(), nil
 	default:
 		return nil, fmt.Errorf("unsupported policy %q", name)
 	}

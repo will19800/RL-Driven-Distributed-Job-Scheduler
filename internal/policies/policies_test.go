@@ -91,13 +91,100 @@ func TestRandomFitIsSeededAndStable(t *testing.T) {
 	}
 }
 
+func heterogeneousFixture(t *testing.T) scheduler.Snapshot {
+	t.Helper()
+	nodes := []domain.Node{
+		{
+			ID:        "node-a",
+			Capacity:  domain.ResourceVector{CPUMillis: 4_000, MemoryMiB: 8_000},
+			Allocated: domain.ResourceVector{CPUMillis: 1_000, MemoryMiB: 6_000},
+			State:     domain.NodeStateAvailable,
+		},
+		{
+			ID:        "node-b",
+			Capacity:  domain.ResourceVector{CPUMillis: 8_000, MemoryMiB: 4_000},
+			Allocated: domain.ResourceVector{CPUMillis: 2_000, MemoryMiB: 500},
+			State:     domain.NodeStateAvailable,
+		},
+	}
+	jobs := []domain.Job{{
+		ID:       "job-mixed",
+		Request:  domain.ResourceVector{CPUMillis: 1_000, MemoryMiB: 2_000},
+		Duration: time.Second,
+		State:    domain.JobStateQueued,
+	}}
+	snapshot, err := scheduler.NewSnapshot(0, nodes, jobs)
+	if err != nil {
+		t.Fatalf("NewSnapshot() unexpected error: %v", err)
+	}
+	return snapshot
+}
+
+func TestNormalizedPoliciesChooseOppositePackingGoals(t *testing.T) {
+	t.Parallel()
+	snapshot := heterogeneousFixture(t)
+	tests := []struct {
+		policy scheduler.Policy
+		want   domain.NodeID
+	}{
+		{NewLeastLoaded(), "node-b"},
+		{NewBinPack(), "node-a"},
+	}
+	for _, test := range tests {
+		t.Run(test.policy.Name(), func(t *testing.T) {
+			t.Parallel()
+			got := selectedNodes(t, test.policy, snapshot, 1)[0]
+			if got != test.want {
+				t.Fatalf("selected node = %q, want %q", got, test.want)
+			}
+		})
+	}
+}
+
+func TestNormalizedPoliciesBreakTiesByNodeID(t *testing.T) {
+	t.Parallel()
+	for _, policy := range []scheduler.Policy{NewLeastLoaded(), NewBinPack()} {
+		if got := selectedNodes(t, policy, policyFixture(t), 1)[0]; got != "node-a" {
+			t.Fatalf("%s selected node = %q, want node-a", policy.Name(), got)
+		}
+	}
+}
+
+func TestNormalizedUsageIgnoresUnrequestedDimensions(t *testing.T) {
+	t.Parallel()
+	request := domain.ResourceVector{CPUMillis: 1_000}
+	withoutGPU := domain.Node{
+		Capacity:  domain.ResourceVector{CPUMillis: 4_000},
+		Allocated: domain.ResourceVector{CPUMillis: 1_000},
+	}
+	withGPU := domain.Node{
+		Capacity:  domain.ResourceVector{CPUMillis: 4_000, GPUs: 8},
+		Allocated: domain.ResourceVector{CPUMillis: 1_000},
+	}
+	left, leftErr := normalizedUsage(withoutGPU, request, false)
+	right, rightErr := normalizedUsage(withGPU, request, false)
+	if leftErr != nil || rightErr != nil {
+		t.Fatalf("normalizedUsage() errors = %v and %v", leftErr, rightErr)
+	}
+	if left != right {
+		t.Fatalf("scores = %f and %f, want equal", left, right)
+	}
+}
+
+func TestNormalizedUsageRejectsZeroRequest(t *testing.T) {
+	t.Parallel()
+	if _, err := normalizedUsage(domain.Node{}, domain.ResourceVector{}, false); err == nil {
+		t.Fatal("normalizedUsage() error = nil, want error")
+	}
+}
+
 func TestPoliciesDeferWithoutFeasibleWork(t *testing.T) {
 	t.Parallel()
 	snapshot, err := scheduler.NewSnapshot(0, policyFixture(t).Nodes(), nil)
 	if err != nil {
 		t.Fatalf("NewSnapshot() unexpected error: %v", err)
 	}
-	for _, policy := range []scheduler.Policy{NewRoundRobin(), NewRandomFit(1)} {
+	for _, policy := range []scheduler.Policy{NewRoundRobin(), NewRandomFit(1), NewLeastLoaded(), NewBinPack()} {
 		evaluation, err := scheduler.Evaluate(context.Background(), policy, snapshot)
 		if err != nil {
 			t.Fatalf("Evaluate(%s) unexpected error: %v", policy.Name(), err)
@@ -112,7 +199,7 @@ func TestPoliciesHonorCancellation(t *testing.T) {
 	t.Parallel()
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	for _, policy := range []scheduler.Policy{NewRoundRobin(), NewRandomFit(1)} {
+	for _, policy := range []scheduler.Policy{NewRoundRobin(), NewRandomFit(1), NewLeastLoaded(), NewBinPack()} {
 		_, err := policy.Decide(ctx, policyFixture(t))
 		if !errors.Is(err, context.Canceled) {
 			t.Fatalf("Decide(%s) error = %v, want context.Canceled", policy.Name(), err)

@@ -171,6 +171,12 @@ Reference policies:
 - Bin-pack: chooses the feasible node with the least residual normalized capacity after placement.
 
 Tie-breaking must always be stable by node ID unless a seeded policy explicitly randomizes.
+For least-loaded and bin-pack, normalized usage is the arithmetic mean of
+`allocated / capacity` over only the resource dimensions requested by the job.
+Least-loaded minimizes the current score; bin-pack maximizes the score after
+placement, which minimizes normalized residual capacity. Ignoring unrequested
+dimensions prevents CPU-only jobs from preferring scarce accelerators merely
+because unused GPU capacity lowers an all-dimension average.
 
 ### 7.4 Workload generation
 

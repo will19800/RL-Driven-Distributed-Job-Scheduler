@@ -29,7 +29,7 @@ not yet require third-party dependencies.
 |---|---|
 | M0 — Truthful project foundation | Complete |
 | M1 — Deterministic simulator vertical slice | Complete |
-| M2 — Baseline scheduler suite | In progress (round-robin and random-fit available) |
+| M2 — Baseline scheduler suite | In progress (all four baseline policies available) |
 | M3–M7 — Experiments, RL, evidence, and release | Planned |
 
 ## Run the smoke simulation
@@ -39,10 +39,11 @@ go run ./cmd/scheduler-sim run --config configs/experiments/smoke.yaml
 ```
 
 The command defaults to the deterministic `first-fit` policy and writes a
-versioned JSON summary to standard output. Use `--policy round-robin` or
-`--policy random-fit` to select a baseline, and `--output summary.json` to write
-the result to a file. Random-fit uses a policy-local stream derived from the
-configuration seed, so repeated runs remain reproducible.
+versioned JSON summary to standard output. The baseline choices are
+`round-robin`, `random-fit`, `least-loaded`, and `bin-pack`. Use
+`--output summary.json` to write the result to a file. Random-fit uses a
+policy-local stream derived from the configuration seed, so repeated runs
+remain reproducible.
 
 ## Development commands
 

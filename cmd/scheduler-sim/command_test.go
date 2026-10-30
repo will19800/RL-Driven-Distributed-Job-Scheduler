@@ -63,7 +63,7 @@ func TestRunCLIWritesOutputFile(t *testing.T) {
 
 func TestRunCLISupportsBaselinePolicies(t *testing.T) {
 	t.Parallel()
-	for _, policy := range []string{"round-robin", "random-fit"} {
+	for _, policy := range []string{"round-robin", "random-fit", "least-loaded", "bin-pack"} {
 		t.Run(policy, func(t *testing.T) {
 			t.Parallel()
 			var stdout, stderr bytes.Buffer
@@ -79,6 +79,22 @@ func TestRunCLISupportsBaselinePolicies(t *testing.T) {
 				t.Fatalf("summary = %+v, want policy %q and 3 completed jobs", summary, policy)
 			}
 		})
+	}
+}
+
+func TestRunCLIAcceptsBinPackAlias(t *testing.T) {
+	t.Parallel()
+	var stdout, stderr bytes.Buffer
+	code := runCLI(context.Background(), []string{"run", "--config", smokeConfigPath(), "--policy", "binpack"}, &stdout, &stderr)
+	if code != 0 {
+		t.Fatalf("runCLI() code = %d, stderr = %s", code, stderr.String())
+	}
+	var summary resultSummary
+	if err := json.Unmarshal(stdout.Bytes(), &summary); err != nil {
+		t.Fatalf("summary is not valid JSON: %v", err)
+	}
+	if summary.Policy != "bin-pack" {
+		t.Fatalf("summary policy = %q, want bin-pack", summary.Policy)
 	}
 }
 
