@@ -3,11 +3,11 @@
 A research-oriented distributed cluster scheduler simulator being built with a
 Go simulation core and Python reinforcement-learning tooling.
 
-The project currently has a deterministic simulator vertical slice and is
-building its baseline scheduler suite. The RL training pipeline and performance
-benchmarks remain planned. Earlier references to a 27% p99 latency reduction
-and an 18% utilization improvement are target hypotheses; no repository
-evidence currently validates those figures.
+The project currently has a deterministic simulator and four baseline
+schedulers, and is moving into its experiment and measurement platform. The RL
+training pipeline and performance benchmarks remain planned. Earlier references
+to a 27% p99 latency reduction and an 18% utilization improvement are target
+hypotheses; no repository evidence currently validates those figures.
 
 See [the design and delivery plan](docs/PROJECT_DESIGN.md) for the architecture,
 milestones, validation rules, and ordered commit roadmap. The
@@ -29,8 +29,9 @@ not yet require third-party dependencies.
 |---|---|
 | M0 — Truthful project foundation | Complete |
 | M1 — Deterministic simulator vertical slice | Complete |
-| M2 — Baseline scheduler suite | In progress (all four baseline policies available) |
-| M3–M7 — Experiments, RL, evidence, and release | Planned |
+| M2 — Baseline scheduler suite | Complete |
+| M3 — Experiment and measurement platform | Next |
+| M4–M7 — RL, evidence, and release | Planned |
 
 ## Run the smoke simulation
 

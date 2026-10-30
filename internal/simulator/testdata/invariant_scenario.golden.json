@@ -1,0 +1,109 @@
+{
+  "schema_version": "v1",
+  "events": [
+    {
+      "time": "0s",
+      "sequence": 0,
+      "type": "job_submitted",
+      "job_id": "job-a"
+    },
+    {
+      "time": "0s",
+      "sequence": 1,
+      "type": "job_submitted",
+      "job_id": "job-b"
+    },
+    {
+      "time": "0s",
+      "sequence": 3,
+      "type": "job_started",
+      "job_id": "job-a",
+      "node_id": "node-a"
+    },
+    {
+      "time": "0s",
+      "sequence": 4,
+      "type": "job_started",
+      "job_id": "job-b",
+      "node_id": "node-a"
+    },
+    {
+      "time": "1s",
+      "sequence": 2,
+      "type": "job_submitted",
+      "job_id": "job-c"
+    },
+    {
+      "time": "1s",
+      "sequence": 5,
+      "type": "job_started",
+      "job_id": "job-c",
+      "node_id": "node-b"
+    },
+    {
+      "time": "1s",
+      "sequence": 7,
+      "type": "job_completed",
+      "job_id": "job-b",
+      "node_id": "node-a"
+    },
+    {
+      "time": "3s",
+      "sequence": 6,
+      "type": "job_completed",
+      "job_id": "job-a",
+      "node_id": "node-a"
+    },
+    {
+      "time": "3s",
+      "sequence": 8,
+      "type": "job_completed",
+      "job_id": "job-c",
+      "node_id": "node-b"
+    }
+  ],
+  "now": "3s",
+  "nodes": [
+    {
+      "id": "node-a",
+      "allocated": {
+        "cpu_millis": 0,
+        "memory_mib": 0,
+        "gpus": 0,
+        "ephemeral_disk_mib": 0
+      }
+    },
+    {
+      "id": "node-b",
+      "allocated": {
+        "cpu_millis": 0,
+        "memory_mib": 0,
+        "gpus": 0,
+        "ephemeral_disk_mib": 0
+      }
+    }
+  ],
+  "jobs": [
+    {
+      "id": "job-a",
+      "state": "completed",
+      "assigned_node": "node-a",
+      "start_time": "0s",
+      "end_time": "3s"
+    },
+    {
+      "id": "job-b",
+      "state": "completed",
+      "assigned_node": "node-a",
+      "start_time": "0s",
+      "end_time": "1s"
+    },
+    {
+      "id": "job-c",
+      "state": "completed",
+      "assigned_node": "node-b",
+      "start_time": "1s",
+      "end_time": "3s"
+    }
+  ]
+}

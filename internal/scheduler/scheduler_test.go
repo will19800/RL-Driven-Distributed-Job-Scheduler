@@ -188,3 +188,30 @@ func TestEvaluateDistinguishesPolicyAndValidationErrors(t *testing.T) {
 		})
 	}
 }
+
+func FuzzDecisionValidationBoundary(f *testing.F) {
+	f.Add(uint8(0), "", "", uint8(0))
+	f.Add(uint8(1), "job-low", "node-a", uint8(1))
+	f.Add(uint8(2), "missing", "node-a", uint8(2))
+	f.Fuzz(func(t *testing.T, mode uint8, jobID, nodeID string, count uint8) {
+		if len(jobID) > 64 || len(nodeID) > 64 {
+			t.Skip()
+		}
+		snapshot := testSnapshot(t)
+		decision := Decision{Defer: mode%4 == 0}
+		placementCount := int(count % 5)
+		if mode%4 != 0 && placementCount == 0 {
+			placementCount = 1
+		}
+		for range placementCount {
+			decision.Placements = append(decision.Placements, domain.Placement{
+				JobID:  domain.JobID(jobID),
+				NodeID: domain.NodeID(nodeID),
+			})
+		}
+		err := ValidateDecision(snapshot, decision)
+		if err != nil && !errors.Is(err, ErrInvalidDecision) {
+			t.Fatalf("ValidateDecision() error = %v, want ErrInvalidDecision", err)
+		}
+	})
+}

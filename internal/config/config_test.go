@@ -222,3 +222,28 @@ func TestDomainValuesReturnDefensiveLabels(t *testing.T) {
 		t.Fatal("DomainValues() exposed configuration labels")
 	}
 }
+
+func FuzzDecodeConfigurationBoundary(f *testing.F) {
+	f.Add([]byte(validYAML()))
+	f.Add([]byte("schema_version: v1\n"))
+	f.Add([]byte{0xff, 0x00, 0x7f})
+	f.Fuzz(func(t *testing.T, input []byte) {
+		if len(input) > maxConfigSize+1 {
+			t.Skip()
+		}
+		configuration, err := Decode(strings.NewReader(string(input)))
+		if err != nil {
+			if !errors.Is(err, ErrInvalidConfig) && !errors.Is(err, ErrConfigTooLarge) {
+				t.Fatalf("Decode() error = %v, want a classified configuration error", err)
+			}
+			return
+		}
+		nodes, jobs, err := configuration.DomainValues()
+		if err != nil {
+			t.Fatalf("DomainValues() after successful Decode() unexpected error: %v", err)
+		}
+		if _, err := simulator.NewSimulation(nodes, jobs); err != nil {
+			t.Fatalf("NewSimulation() after successful Decode() unexpected error: %v", err)
+		}
+	})
+}
