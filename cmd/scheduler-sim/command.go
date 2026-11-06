@@ -11,6 +11,7 @@ import (
 
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/config"
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/domain"
+	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/metrics"
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/policies"
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/scheduler"
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/simulator"
@@ -91,10 +92,11 @@ func runCommand(ctx context.Context, args []string, stdout io.Writer) *commandEr
 	if err != nil {
 		return newCommandError("usage", err)
 	}
-	if err := runSimulation(ctx, simulation, selectedPolicy); err != nil {
+	report, err := runSimulation(ctx, simulation, selectedPolicy, metrics.NewCollector())
+	if err != nil {
 		return newCommandError("simulation_failed", err)
 	}
-	encoded, err := json.MarshalIndent(buildSummary(selectedPolicy.Name(), configuration.Seed, simulation), "", "  ")
+	encoded, err := json.MarshalIndent(buildSummary(selectedPolicy.Name(), configuration.Seed, simulation, report), "", "  ")
 	if err != nil {
 		return newCommandError("result_encode_failed", err)
 	}
@@ -112,23 +114,30 @@ func runCommand(ctx context.Context, args []string, stdout io.Writer) *commandEr
 }
 
 func runFirstFit(ctx context.Context, simulation *simulator.Simulation) error {
-	return runSimulation(ctx, simulation, firstFitPolicy{})
+	_, err := runSimulation(ctx, simulation, firstFitPolicy{}, metrics.NewCollector())
+	return err
 }
 
-func runSimulation(ctx context.Context, simulation *simulator.Simulation, policy scheduler.Policy) error {
+func runSimulation(ctx context.Context, simulation *simulator.Simulation, policy scheduler.Policy, collector *metrics.Collector) (metrics.Report, error) {
+	if err := observeMetrics(collector, simulation); err != nil {
+		return metrics.Report{}, err
+	}
 	for {
 		_, ok, err := simulation.RunNext(ctx)
 		if err != nil {
-			return err
+			return metrics.Report{}, err
 		}
 		if !ok {
-			return nil
+			return collector.Finalize(simulation.Now(), simulation.Jobs())
+		}
+		if err := observeMetrics(collector, simulation); err != nil {
+			return metrics.Report{}, err
 		}
 		if next, exists := simulation.NextEvent(); exists && next.Time == simulation.Now() {
 			continue
 		}
-		if _, err := schedule(ctx, simulation, policy); err != nil {
-			return err
+		if _, err := schedule(ctx, simulation, policy, collector); err != nil {
+			return metrics.Report{}, err
 		}
 	}
 }
@@ -152,12 +161,13 @@ func (firstFitPolicy) Decide(_ context.Context, snapshot scheduler.Snapshot) (sc
 	return scheduler.Decision{Defer: true}, nil
 }
 
-func schedule(ctx context.Context, simulation *simulator.Simulation, policy scheduler.Policy) (bool, error) {
+func schedule(ctx context.Context, simulation *simulator.Simulation, policy scheduler.Policy, collector *metrics.Collector) (bool, error) {
 	snapshot, err := scheduler.NewSnapshot(simulation.Now(), simulation.Nodes(), simulation.Jobs())
 	if err != nil {
 		return false, err
 	}
 	evaluation, err := scheduler.Evaluate(ctx, policy, snapshot)
+	collector.RecordDecision(evaluation.Telemetry)
 	if err != nil {
 		return false, err
 	}
@@ -167,6 +177,16 @@ func schedule(ctx context.Context, simulation *simulator.Simulation, policy sche
 		}
 	}
 	return len(evaluation.Decision.Placements) != 0, nil
+}
+
+func observeMetrics(collector *metrics.Collector, simulation *simulator.Simulation) error {
+	queued := 0
+	for _, job := range simulation.Jobs() {
+		if job.State == domain.JobStateQueued {
+			queued++
+		}
+	}
+	return collector.ObserveCluster(simulation.Now(), simulation.Nodes(), queued)
 }
 
 func newPolicy(name string, seed int64) (scheduler.Policy, error) {

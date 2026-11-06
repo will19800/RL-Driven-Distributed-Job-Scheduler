@@ -30,7 +30,7 @@ not yet require third-party dependencies.
 | M0 — Truthful project foundation | Complete |
 | M1 — Deterministic simulator vertical slice | Complete |
 | M2 — Baseline scheduler suite | Complete |
-| M3 — Experiment and measurement platform | Next |
+| M3 — Experiment and measurement platform | In progress (aggregate metrics available) |
 | M4–M7 — RL, evidence, and release | Planned |
 
 ## Run the smoke simulation
@@ -45,6 +45,10 @@ versioned JSON summary to standard output. The baseline choices are
 `--output summary.json` to write the result to a file. Random-fit uses a
 policy-local stream derived from the configuration seed, so repeated runs
 remain reproducible.
+
+The summary includes streaming latency and queue-wait histograms, throughput,
+time-weighted resource utilization and queue depth, resource fragmentation,
+bounded-slowdown fairness, deadline outcomes, and scheduler decision telemetry.
 
 ## Development commands
 

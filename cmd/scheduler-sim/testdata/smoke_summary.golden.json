@@ -10,5 +10,51 @@
     "running": 0,
     "completed": 3,
     "rejected": 0
+  },
+  "metrics": {
+    "throughput_jobs_per_second": 0.5,
+    "success_rate": 1,
+    "rejection_rate": 0,
+    "deadline_jobs": 3,
+    "deadline_violations": 0,
+    "deadline_violation_rate": 0,
+    "latency": {
+      "count": 3,
+      "min": "2s",
+      "max": "5s",
+      "mean": "3.666666666s",
+      "p50": "5s",
+      "p95": "5s",
+      "p99": "5s"
+    },
+    "queue_wait": {
+      "count": 3,
+      "min": "0s",
+      "max": "0s",
+      "mean": "0s",
+      "p50": "0s",
+      "p95": "0s",
+      "p99": "0s"
+    },
+    "mean_bounded_slowdown": 1,
+    "slowdown_fairness_jain": 1,
+    "utilization": {
+      "cpu": 0.20833333333333334,
+      "memory": 0.23750000000000002,
+      "gpu": 0.4166666666666667,
+      "ephemeral_disk": 0.01958550347222222
+    },
+    "mean_queue_depth": 0,
+    "resource_fragmentation": 0.36259765624999996,
+    "scheduler": {
+      "decisions": 9,
+      "placements": 3,
+      "deferred": 6,
+      "policy_errors": 0,
+      "invalid_decisions": 0,
+      "total_duration": "0s",
+      "mean_duration": "0s",
+      "max_duration": "0s"
+    }
   }
 }

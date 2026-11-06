@@ -29,8 +29,20 @@ func TestRunCLIMatchesGoldenSmokeSummary(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ReadFile(golden) unexpected error: %v", err)
 	}
-	if !bytes.Equal(stdout.Bytes(), want) {
-		t.Fatalf("summary mismatch\n--- got ---\n%s--- want ---\n%s", stdout.Bytes(), want)
+	var normalized resultSummary
+	if err := json.Unmarshal(stdout.Bytes(), &normalized); err != nil {
+		t.Fatalf("summary is not valid JSON: %v", err)
+	}
+	normalized.Metrics.Scheduler.TotalDuration = "0s"
+	normalized.Metrics.Scheduler.MeanDuration = "0s"
+	normalized.Metrics.Scheduler.MaxDuration = "0s"
+	got, err := json.MarshalIndent(normalized, "", "  ")
+	if err != nil {
+		t.Fatalf("MarshalIndent(normalized) unexpected error: %v", err)
+	}
+	got = append(got, '\n')
+	if !bytes.Equal(got, want) {
+		t.Fatalf("summary mismatch\n--- got ---\n%s--- want ---\n%s", got, want)
 	}
 	if stderr.Len() != 0 {
 		t.Fatalf("stderr = %q, want empty", stderr.String())

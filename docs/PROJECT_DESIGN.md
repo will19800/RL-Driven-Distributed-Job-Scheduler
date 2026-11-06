@@ -275,6 +275,16 @@ Core metrics:
 
 Avoid unbounded in-memory samples for large runs. Use streaming counters/histograms and optional per-job output.
 
+Aggregate utilization and queue depth are time-weighted over simulated time.
+Fragmentation is the mean per-node spread between the largest and smallest
+normalized free-resource fractions, excluding dimensions with zero capacity.
+Latency and queue-wait quantiles use declared fixed histogram buckets and report
+the selected bucket's upper bound. Until tenant identities are introduced,
+fairness is Jain's index over each completed job's inverse bounded slowdown;
+this measures equality of delivered service without treating long jobs as
+intrinsically unfair. Scheduler wall-clock decision timing and error counters
+remain separate from simulated workload measurements.
+
 ## 8. Configuration and interfaces
 
 Use YAML for human-authored configs with strict decoding: unknown fields are errors. Each config has a `schema_version`.
