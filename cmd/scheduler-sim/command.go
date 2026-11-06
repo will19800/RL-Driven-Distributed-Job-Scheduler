@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -8,17 +9,19 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"time"
 
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/config"
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/domain"
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/metrics"
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/policies"
+	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/results"
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/scheduler"
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/simulator"
 )
 
 const usage = `Usage:
-  scheduler-sim run --config PATH [--output PATH] [--policy POLICY]
+  scheduler-sim run --config PATH [--output PATH] [--results-dir DIR] [--policy POLICY]
   scheduler-sim --version
 
 Policies: first-fit, round-robin, random-fit, least-loaded, bin-pack
@@ -66,6 +69,7 @@ func runCommand(ctx context.Context, args []string, stdout io.Writer) *commandEr
 	flags.SetOutput(io.Discard)
 	configPath := flags.String("config", "", "simulation configuration path")
 	outputPath := flags.String("output", "-", "summary output path, or - for stdout")
+	resultsDir := flags.String("results-dir", "", "write a versioned detailed result bundle")
 	policy := flags.String("policy", "first-fit", "scheduling policy")
 	if err := flags.Parse(args); err != nil {
 		return newCommandError("usage", err)
@@ -76,7 +80,12 @@ func runCommand(ctx context.Context, args []string, stdout io.Writer) *commandEr
 	if flags.NArg() != 0 {
 		return newCommandError("usage", fmt.Errorf("unexpected arguments: %v", flags.Args()))
 	}
-	configuration, err := config.Load(*configPath)
+	startedAt := time.Now()
+	configData, err := os.ReadFile(*configPath)
+	if err != nil {
+		return newCommandError("config_load_failed", err)
+	}
+	configuration, err := config.Decode(bytes.NewReader(configData))
 	if err != nil {
 		return newCommandError("config_load_failed", err)
 	}
@@ -92,15 +101,26 @@ func runCommand(ctx context.Context, args []string, stdout io.Writer) *commandEr
 	if err != nil {
 		return newCommandError("usage", err)
 	}
-	report, err := runSimulation(ctx, simulation, selectedPolicy, metrics.NewCollector())
+	var recorder *detailRecorder
+	if *resultsDir != "" {
+		recorder = &detailRecorder{}
+	}
+	report, err := runSimulation(ctx, simulation, selectedPolicy, metrics.NewCollector(), recorder)
 	if err != nil {
 		return newCommandError("simulation_failed", err)
 	}
-	encoded, err := json.MarshalIndent(buildSummary(selectedPolicy.Name(), configuration.Seed, simulation, report), "", "  ")
+	summary := buildSummary(selectedPolicy.Name(), configuration.Seed, simulation, report)
+	encoded, err := json.MarshalIndent(summary, "", "  ")
 	if err != nil {
 		return newCommandError("result_encode_failed", err)
 	}
 	encoded = append(encoded, '\n')
+	if *resultsDir != "" {
+		manifest := results.NewManifest(*configPath, configData, selectedPolicy.Name(), configuration.Seed, version, startedAt, time.Now())
+		if err := results.WriteBundle(*resultsDir, manifest, summary, buildJobRecords(simulation.Jobs()), recorder.series); err != nil {
+			return newCommandError("result_write_failed", err)
+		}
+	}
 	if *outputPath == "-" {
 		if _, err := stdout.Write(encoded); err != nil {
 			return newCommandError("result_write_failed", err)
@@ -114,16 +134,21 @@ func runCommand(ctx context.Context, args []string, stdout io.Writer) *commandEr
 }
 
 func runFirstFit(ctx context.Context, simulation *simulator.Simulation) error {
-	_, err := runSimulation(ctx, simulation, firstFitPolicy{}, metrics.NewCollector())
+	_, err := runSimulation(ctx, simulation, firstFitPolicy{}, metrics.NewCollector(), nil)
 	return err
 }
 
-func runSimulation(ctx context.Context, simulation *simulator.Simulation, policy scheduler.Policy, collector *metrics.Collector) (metrics.Report, error) {
+func runSimulation(ctx context.Context, simulation *simulator.Simulation, policy scheduler.Policy, collector *metrics.Collector, recorder *detailRecorder) (metrics.Report, error) {
 	if err := observeMetrics(collector, simulation); err != nil {
 		return metrics.Report{}, err
 	}
+	if recorder != nil {
+		if err := recorder.record(simulator.Event{Type: "initial"}, simulation); err != nil {
+			return metrics.Report{}, err
+		}
+	}
 	for {
-		_, ok, err := simulation.RunNext(ctx)
+		event, ok, err := simulation.RunNext(ctx)
 		if err != nil {
 			return metrics.Report{}, err
 		}
@@ -132,6 +157,11 @@ func runSimulation(ctx context.Context, simulation *simulator.Simulation, policy
 		}
 		if err := observeMetrics(collector, simulation); err != nil {
 			return metrics.Report{}, err
+		}
+		if recorder != nil {
+			if err := recorder.record(event, simulation); err != nil {
+				return metrics.Report{}, err
+			}
 		}
 		if next, exists := simulation.NextEvent(); exists && next.Time == simulation.Now() {
 			continue

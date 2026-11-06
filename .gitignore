@@ -44,6 +44,7 @@ build/
 # Local project build and cache output
 /bin/
 /.cache/
+/results/
 
 # Editor/IDE
 # .idea/

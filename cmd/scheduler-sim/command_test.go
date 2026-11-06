@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/domain"
+	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/results"
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/simulator"
 )
 
@@ -71,6 +72,36 @@ func TestRunCLIWritesOutputFile(t *testing.T) {
 	if summary.Jobs.Completed != 3 {
 		t.Fatalf("completed jobs = %d, want 3", summary.Jobs.Completed)
 	}
+}
+
+func TestRunCLIWritesValidDetailedBundle(t *testing.T) {
+	t.Parallel()
+	directory := filepath.Join(t.TempDir(), "run")
+	var stdout, stderr bytes.Buffer
+	code := runCLI(context.Background(), []string{"run", "--config", smokeConfigPath(), "--results-dir", directory}, &stdout, &stderr)
+	if code != 0 {
+		t.Fatalf("runCLI() code = %d, stderr = %s", code, stderr.String())
+	}
+	if err := results.ValidateBundle(directory); err != nil {
+		t.Fatalf("ValidateBundle() unexpected error: %v", err)
+	}
+	for _, name := range []string{"manifest.json", "summary.json", "jobs.csv", "timeseries.csv"} {
+		if _, err := os.Stat(filepath.Join(directory, name)); err != nil {
+			t.Fatalf("missing bundle file %q: %v", name, err)
+		}
+	}
+	if !bytes.Equal(stdout.Bytes(), mustReadFile(t, filepath.Join(directory, "summary.json"))) {
+		t.Fatal("stdout summary differs from bundle summary")
+	}
+}
+
+func mustReadFile(t *testing.T, path string) []byte {
+	t.Helper()
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("ReadFile(%q): %v", path, err)
+	}
+	return data
 }
 
 func TestRunCLISupportsBaselinePolicies(t *testing.T) {

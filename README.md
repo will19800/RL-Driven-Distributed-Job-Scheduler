@@ -12,7 +12,9 @@ hypotheses; no repository evidence currently validates those figures.
 See [the design and delivery plan](docs/PROJECT_DESIGN.md) for the architecture,
 milestones, validation rules, and ordered commit roadmap. The
 [configuration reference](docs/CONFIGURATION.md) documents the strict v1 YAML
-schema and links to the tested smoke configuration.
+schema and links to the tested smoke configuration. The
+[result bundle reference](docs/RESULTS.md) defines output schemas and integrity
+checks.
 
 ## Prerequisites
 
@@ -49,6 +51,19 @@ remain reproducible.
 The summary includes streaming latency and queue-wait histograms, throughput,
 time-weighted resource utilization and queue depth, resource fragmentation,
 bounded-slowdown fairness, deadline outcomes, and scheduler decision telemetry.
+
+Write detailed, provenance-linked results and validate them with:
+
+```bash
+go run ./cmd/scheduler-sim run \
+  --config configs/experiments/smoke.yaml \
+  --results-dir results/smoke
+go run ./cmd/result-check results/smoke
+```
+
+Result directories are never overwritten. Each bundle contains a versioned
+manifest, summary, per-job CSV, and event-aligned time-series CSV with SHA-256
+integrity checks.
 
 ## Development commands
 

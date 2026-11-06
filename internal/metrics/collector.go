@@ -33,6 +33,12 @@ type ResourceUtilization struct {
 	Ephemeral float64 `json:"ephemeral_disk"`
 }
 
+// ClusterMeasurement is an instantaneous aggregate cluster measurement.
+type ClusterMeasurement struct {
+	Utilization   ResourceUtilization
+	Fragmentation float64
+}
+
 // DecisionMetrics aggregates scheduler overhead independently from workload metrics.
 type DecisionMetrics struct {
 	Count            uint64
@@ -93,7 +99,7 @@ func (c *Collector) ObserveCluster(at time.Duration, nodes []domain.Node, queued
 	if c.initialized && at < c.lastAt {
 		return fmt.Errorf("%w: time moved backward from %s to %s", ErrInvalidObservation, c.lastAt, at)
 	}
-	utilization, fragmentation, err := measureCluster(nodes)
+	measurement, err := MeasureCluster(nodes)
 	if err != nil {
 		return err
 	}
@@ -101,7 +107,7 @@ func (c *Collector) ObserveCluster(at time.Duration, nodes []domain.Node, queued
 		c.integrate(at - c.lastAt)
 	}
 	c.initialized = true
-	c.lastAt, c.lastUtil, c.lastQueue, c.lastFrag = at, utilization, queued, fragmentation
+	c.lastAt, c.lastUtil, c.lastQueue, c.lastFrag = at, measurement.Utilization, queued, measurement.Fragmentation
 	return nil
 }
 
@@ -200,22 +206,23 @@ func (c *Collector) integrate(delta time.Duration) {
 	c.fragArea += c.lastFrag * seconds
 }
 
-func measureCluster(nodes []domain.Node) (ResourceUtilization, float64, error) {
+// MeasureCluster validates nodes and calculates instantaneous utilization and fragmentation.
+func MeasureCluster(nodes []domain.Node) (ClusterMeasurement, error) {
 	var allocated, capacity domain.ResourceVector
 	var fragmentation float64
 	var available int
 	for _, node := range nodes {
 		if err := node.Validate(); err != nil {
-			return ResourceUtilization{}, 0, fmt.Errorf("%w: node %q: %v", ErrInvalidObservation, node.ID, err)
+			return ClusterMeasurement{}, fmt.Errorf("%w: node %q: %v", ErrInvalidObservation, node.ID, err)
 		}
 		var err error
 		allocated, err = allocated.Add(node.Allocated)
 		if err != nil {
-			return ResourceUtilization{}, 0, fmt.Errorf("%w: allocation total: %v", ErrInvalidObservation, err)
+			return ClusterMeasurement{}, fmt.Errorf("%w: allocation total: %v", ErrInvalidObservation, err)
 		}
 		capacity, err = capacity.Add(node.Capacity)
 		if err != nil {
-			return ResourceUtilization{}, 0, fmt.Errorf("%w: capacity total: %v", ErrInvalidObservation, err)
+			return ClusterMeasurement{}, fmt.Errorf("%w: capacity total: %v", ErrInvalidObservation, err)
 		}
 		if node.State == domain.NodeStateAvailable {
 			fragmentation += nodeFragmentation(node)
@@ -231,7 +238,7 @@ func measureCluster(nodes []domain.Node) (ResourceUtilization, float64, error) {
 	if available > 0 {
 		fragmentation /= float64(available)
 	}
-	return utilization, fragmentation, nil
+	return ClusterMeasurement{Utilization: utilization, Fragmentation: fragmentation}, nil
 }
 
 func nodeFragmentation(node domain.Node) float64 {
