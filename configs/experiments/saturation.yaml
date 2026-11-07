@@ -1,0 +1,18 @@
+schema_version: v1
+seed: 1703
+cluster:
+  nodes:
+    - id: worker-1
+      type: general
+      capacity: {cpu_millis: 8000, memory_mib: 16384, gpus: 0, ephemeral_disk_mib: 50000}
+    - id: worker-2
+      type: general
+      capacity: {cpu_millis: 8000, memory_mib: 16384, gpus: 0, ephemeral_disk_mib: 50000}
+workload:
+  synthetic:
+    count: 300
+    start_time: 0s
+    arrival_rate_per_second: 20
+    duration: {median: 20s, sigma: 0.4, min: 5s, max: 1m}
+    profiles:
+      - {name: balanced, weight: 1, resources: {cpu_millis: 2000, memory_mib: 4096}}

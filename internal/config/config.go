@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/domain"
@@ -51,6 +52,7 @@ type Config struct {
 	Seed          int64          `yaml:"seed"`
 	Cluster       ClusterConfig  `yaml:"cluster"`
 	Workload      WorkloadConfig `yaml:"workload"`
+	baseDir       string
 }
 
 // ClusterConfig defines the initial cluster.
@@ -70,6 +72,14 @@ type NodeConfig struct {
 type WorkloadConfig struct {
 	Jobs      []JobConfig              `yaml:"jobs,omitempty"`
 	Synthetic *SyntheticWorkloadConfig `yaml:"synthetic,omitempty"`
+	Trace     *TraceWorkloadConfig     `yaml:"trace,omitempty"`
+}
+
+// TraceWorkloadConfig points to a strict CSV or JSON job trace. Relative paths
+// are resolved from the configuration file's directory.
+type TraceWorkloadConfig struct {
+	Path   string `yaml:"path"`
+	Format string `yaml:"format,omitempty"`
 }
 
 // JobConfig defines one queued, non-preemptive job.
@@ -87,8 +97,16 @@ type SyntheticWorkloadConfig struct {
 	Count                int                     `yaml:"count"`
 	StartTime            Duration                `yaml:"start_time"`
 	ArrivalRatePerSecond float64                 `yaml:"arrival_rate_per_second"`
+	ArrivalPhases        []ArrivalPhaseConfig    `yaml:"arrival_phases,omitempty"`
 	Duration             SyntheticDurationConfig `yaml:"duration"`
 	Profiles             []ResourceProfileConfig `yaml:"profiles"`
+}
+
+// ArrivalPhaseConfig is one consecutive Poisson arrival-rate phase.
+type ArrivalPhaseConfig struct {
+	Name          string  `yaml:"name"`
+	Count         int     `yaml:"count"`
+	RatePerSecond float64 `yaml:"rate_per_second"`
 }
 
 // SyntheticDurationConfig defines a bounded log-normal distribution.
@@ -115,7 +133,7 @@ func Load(path string) (Config, error) {
 	}
 	defer file.Close()
 
-	configuration, err := Decode(file)
+	configuration, err := decode(file, filepath.Dir(path))
 	if err != nil {
 		return Config{}, fmt.Errorf("decode configuration %q: %w", path, err)
 	}
@@ -125,6 +143,16 @@ func Load(path string) (Config, error) {
 // Decode reads one bounded YAML document, rejects unknown fields, and validates
 // all schema and domain invariants.
 func Decode(reader io.Reader) (Config, error) {
+	return decode(reader, ".")
+}
+
+// DecodeRelativeTo decodes configuration bytes while resolving referenced
+// workload paths from the directory containing configPath.
+func DecodeRelativeTo(reader io.Reader, configPath string) (Config, error) {
+	return decode(reader, filepath.Dir(configPath))
+}
+
+func decode(reader io.Reader, baseDir string) (Config, error) {
 	data, err := io.ReadAll(io.LimitReader(reader, maxConfigSize+1))
 	if err != nil {
 		return Config{}, fmt.Errorf("%w: read YAML: %v", ErrInvalidConfig, err)
@@ -146,6 +174,7 @@ func Decode(reader io.Reader) (Config, error) {
 		}
 		return Config{}, fmt.Errorf("%w: trailing YAML: %v", ErrInvalidConfig, err)
 	}
+	configuration.baseDir = baseDir
 	if err := configuration.Validate(); err != nil {
 		return Config{}, err
 	}
@@ -166,10 +195,18 @@ func (c Config) DomainValues() ([]domain.Node, []domain.Job, error) {
 	if len(c.Cluster.Nodes) == 0 {
 		return nil, nil, fmt.Errorf("%w: cluster.nodes must not be empty", ErrInvalidConfig)
 	}
-	hasExplicitJobs := len(c.Workload.Jobs) > 0
-	hasSyntheticJobs := c.Workload.Synthetic != nil
-	if hasExplicitJobs == hasSyntheticJobs {
-		return nil, nil, fmt.Errorf("%w: workload must define exactly one of jobs or synthetic", ErrInvalidConfig)
+	sources := 0
+	if len(c.Workload.Jobs) > 0 {
+		sources++
+	}
+	if c.Workload.Synthetic != nil {
+		sources++
+	}
+	if c.Workload.Trace != nil {
+		sources++
+	}
+	if sources != 1 {
+		return nil, nil, fmt.Errorf("%w: workload must define exactly one of jobs, synthetic, or trace", ErrInvalidConfig)
 	}
 
 	nodes := make([]domain.Node, 0, len(c.Cluster.Nodes))
@@ -197,6 +234,20 @@ func (c Config) DomainValues() ([]domain.Node, []domain.Job, error) {
 		jobs, err := workload.Generate(c.Seed, spec)
 		if err != nil {
 			return nil, nil, fmt.Errorf("%w: workload.synthetic: %v", ErrInvalidConfig, err)
+		}
+		return nodes, jobs, nil
+	}
+	if c.Workload.Trace != nil {
+		if c.Workload.Trace.Path == "" {
+			return nil, nil, fmt.Errorf("%w: workload.trace.path is required", ErrInvalidConfig)
+		}
+		path := c.Workload.Trace.Path
+		if !filepath.IsAbs(path) {
+			path = filepath.Join(c.baseDir, path)
+		}
+		jobs, err := workload.LoadTrace(path, c.Workload.Trace.Format)
+		if err != nil {
+			return nil, nil, fmt.Errorf("%w: workload.trace: %v", ErrInvalidConfig, err)
 		}
 		return nodes, jobs, nil
 	}
@@ -238,10 +289,15 @@ func syntheticSpec(input SyntheticWorkloadConfig) workload.Spec {
 			Priority:  profile.Priority,
 		})
 	}
+	phases := make([]workload.ArrivalPhase, 0, len(input.ArrivalPhases))
+	for _, phase := range input.ArrivalPhases {
+		phases = append(phases, workload.ArrivalPhase{Name: phase.Name, Count: phase.Count, RatePerSecond: phase.RatePerSecond})
+	}
 	return workload.Spec{
 		Count:                input.Count,
 		StartTime:            input.StartTime.Duration,
 		ArrivalRatePerSecond: input.ArrivalRatePerSecond,
+		ArrivalPhases:        phases,
 		Duration: workload.DurationSpec{
 			Median: input.Duration.Median.Duration,
 			Sigma:  input.Duration.Sigma,

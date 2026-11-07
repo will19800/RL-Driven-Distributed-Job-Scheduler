@@ -1,0 +1,5 @@
+id,submit_time,cpu_millis,memory_mib,gpus,ephemeral_disk_mib,duration,priority,deadline
+trace-001,0s,500,1024,0,100,2s,1,10s
+trace-002,250ms,2000,2048,0,250,3s,0,
+trace-003,500ms,1000,4096,1,500,4s,2,12s
+trace-004,750ms,250,8192,0,100,2s,0,

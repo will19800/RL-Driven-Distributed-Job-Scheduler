@@ -113,14 +113,45 @@ func TestPoissonArrivalMean(t *testing.T) {
 	}
 }
 
+func TestGenerateArrivalPhases(t *testing.T) {
+	t.Parallel()
+	spec := validSpec()
+	spec.Count = 40_000
+	spec.ArrivalRatePerSecond = 0
+	spec.ArrivalPhases = []ArrivalPhase{
+		{Name: "quiet", Count: 20_000, RatePerSecond: 2},
+		{Name: "burst", Count: 20_000, RatePerSecond: 20},
+	}
+	jobs, err := Generate(88, spec)
+	if err != nil {
+		t.Fatalf("Generate() unexpected error: %v", err)
+	}
+	quietMean := (jobs[19_999].SubmitTime - spec.StartTime).Seconds() / 20_000
+	burstMean := (jobs[39_999].SubmitTime - jobs[19_999].SubmitTime).Seconds() / 20_000
+	if math.Abs(quietMean-0.5) > 0.015 || math.Abs(burstMean-0.05) > 0.002 {
+		t.Fatalf("phase means = %f, %f; want approximately 0.5, 0.05", quietMean, burstMean)
+	}
+}
+
 func TestSpecValidateRejectsInvalidInputs(t *testing.T) {
 	t.Parallel()
 	tests := map[string]func(*Spec){
-		"zero count":         func(s *Spec) { s.Count = 0 },
-		"too many jobs":      func(s *Spec) { s.Count = MaxJobs + 1 },
-		"negative start":     func(s *Spec) { s.StartTime = -1 },
-		"zero arrival":       func(s *Spec) { s.ArrivalRatePerSecond = 0 },
-		"nan arrival":        func(s *Spec) { s.ArrivalRatePerSecond = math.NaN() },
+		"zero count":     func(s *Spec) { s.Count = 0 },
+		"too many jobs":  func(s *Spec) { s.Count = MaxJobs + 1 },
+		"negative start": func(s *Spec) { s.StartTime = -1 },
+		"zero arrival":   func(s *Spec) { s.ArrivalRatePerSecond = 0 },
+		"nan arrival":    func(s *Spec) { s.ArrivalRatePerSecond = math.NaN() },
+		"rate and phases": func(s *Spec) {
+			s.ArrivalPhases = []ArrivalPhase{{Name: "phase", Count: s.Count, RatePerSecond: 1}}
+		},
+		"phase total mismatch": func(s *Spec) {
+			s.ArrivalRatePerSecond = 0
+			s.ArrivalPhases = []ArrivalPhase{{Name: "phase", Count: 1, RatePerSecond: 1}}
+		},
+		"invalid phase rate": func(s *Spec) {
+			s.ArrivalRatePerSecond = 0
+			s.ArrivalPhases = []ArrivalPhase{{Name: "phase", Count: s.Count, RatePerSecond: 0}}
+		},
 		"zero minimum":       func(s *Spec) { s.Duration.Min = 0 },
 		"median below min":   func(s *Spec) { s.Duration.Median = time.Millisecond },
 		"max below min":      func(s *Spec) { s.Duration.Max = time.Millisecond },

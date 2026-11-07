@@ -1,0 +1,27 @@
+schema_version: v1
+seed: 1702
+cluster:
+  nodes:
+    - id: cpu-1
+      type: compute
+      labels: {pool: cpu}
+      capacity: {cpu_millis: 32000, memory_mib: 32768, gpus: 0, ephemeral_disk_mib: 100000}
+    - id: memory-1
+      type: memory
+      labels: {pool: memory}
+      capacity: {cpu_millis: 8000, memory_mib: 131072, gpus: 0, ephemeral_disk_mib: 100000}
+    - id: gpu-1
+      type: accelerator
+      labels: {pool: gpu}
+      capacity: {cpu_millis: 16000, memory_mib: 65536, gpus: 8, ephemeral_disk_mib: 200000}
+workload:
+  synthetic:
+    count: 200
+    start_time: 0s
+    arrival_rate_per_second: 4
+    duration: {median: 10s, sigma: 0.8, min: 1s, max: 2m}
+    profiles:
+      - {name: cpu-heavy, weight: 3, resources: {cpu_millis: 8000, memory_mib: 2048}}
+      - {name: memory-heavy, weight: 3, resources: {cpu_millis: 1000, memory_mib: 32768}}
+      - {name: gpu, weight: 2, resources: {cpu_millis: 2000, memory_mib: 8192, gpus: 1}}
+      - {name: balanced, weight: 4, resources: {cpu_millis: 2000, memory_mib: 4096}}

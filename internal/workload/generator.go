@@ -37,11 +37,20 @@ type ResourceProfile struct {
 	Priority  int32
 }
 
+// ArrivalPhase defines a consecutive segment with its own Poisson rate.
+// Phase counts must sum to the workload count.
+type ArrivalPhase struct {
+	Name          string
+	Count         int
+	RatePerSecond float64
+}
+
 // Spec defines one deterministic synthetic workload.
 type Spec struct {
 	Count                int
 	StartTime            time.Duration
 	ArrivalRatePerSecond float64
+	ArrivalPhases        []ArrivalPhase
 	Duration             DurationSpec
 	Profiles             []ResourceProfile
 }
@@ -54,8 +63,27 @@ func (s Spec) Validate() error {
 	if s.StartTime < 0 {
 		return fmt.Errorf("%w: start time must be non-negative", ErrInvalidSpec)
 	}
-	if !positiveFinite(s.ArrivalRatePerSecond) {
-		return fmt.Errorf("%w: arrival rate must be positive and finite", ErrInvalidSpec)
+	if len(s.ArrivalPhases) == 0 {
+		if !positiveFinite(s.ArrivalRatePerSecond) {
+			return fmt.Errorf("%w: arrival rate must be positive and finite", ErrInvalidSpec)
+		}
+	} else {
+		if s.ArrivalRatePerSecond != 0 {
+			return fmt.Errorf("%w: set either arrival rate or arrival phases, not both", ErrInvalidSpec)
+		}
+		total := 0
+		for index, phase := range s.ArrivalPhases {
+			if phase.Name == "" || phase.Count <= 0 || !positiveFinite(phase.RatePerSecond) {
+				return fmt.Errorf("%w: arrival phase %d requires a name, positive count, and positive finite rate", ErrInvalidSpec, index)
+			}
+			if total > MaxJobs-phase.Count {
+				return fmt.Errorf("%w: arrival phase counts overflow", ErrInvalidSpec)
+			}
+			total += phase.Count
+		}
+		if total != s.Count {
+			return fmt.Errorf("%w: arrival phase counts total %d, want %d", ErrInvalidSpec, total, s.Count)
+		}
 	}
 	if s.Duration.Min <= 0 || s.Duration.Median <= 0 || s.Duration.Max < s.Duration.Min {
 		return fmt.Errorf("%w: duration bounds and median must be positive and ordered", ErrInvalidSpec)
@@ -106,7 +134,7 @@ func Generate(seed int64, spec Spec) ([]domain.Job, error) {
 	jobs := make([]domain.Job, 0, spec.Count)
 	submitTime := spec.StartTime
 	for index := 0; index < spec.Count; index++ {
-		interarrival := arrivalRNG.ExpFloat64() / spec.ArrivalRatePerSecond
+		interarrival := arrivalRNG.ExpFloat64() / arrivalRate(spec, index)
 		delta, err := secondsToDuration(interarrival)
 		if err != nil || delta > time.Duration(math.MaxInt64)-submitTime {
 			return nil, fmt.Errorf("%w: submission %d", ErrGenerationOverflow, index)
@@ -129,6 +157,20 @@ func Generate(seed int64, spec Spec) ([]domain.Job, error) {
 		jobs = append(jobs, job)
 	}
 	return jobs, nil
+}
+
+func arrivalRate(spec Spec, jobIndex int) float64 {
+	if len(spec.ArrivalPhases) == 0 {
+		return spec.ArrivalRatePerSecond
+	}
+	remaining := jobIndex
+	for _, phase := range spec.ArrivalPhases {
+		if remaining < phase.Count {
+			return phase.RatePerSecond
+		}
+		remaining -= phase.Count
+	}
+	return spec.ArrivalPhases[len(spec.ArrivalPhases)-1].RatePerSecond
 }
 
 func newStream(seed int64, stream uint64) *rand.Rand {

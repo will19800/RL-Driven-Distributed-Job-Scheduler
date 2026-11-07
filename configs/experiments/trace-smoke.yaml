@@ -1,0 +1,14 @@
+schema_version: v1
+seed: 42
+cluster:
+  nodes:
+    - id: general-1
+      type: general
+      capacity: {cpu_millis: 8000, memory_mib: 16384, gpus: 0, ephemeral_disk_mib: 50000}
+    - id: gpu-1
+      type: accelerator
+      capacity: {cpu_millis: 16000, memory_mib: 65536, gpus: 4, ephemeral_disk_mib: 100000}
+workload:
+  trace:
+    path: ../traces/smoke.csv
+    format: csv

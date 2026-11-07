@@ -85,7 +85,7 @@ func runCommand(ctx context.Context, args []string, stdout io.Writer) *commandEr
 	if err != nil {
 		return newCommandError("config_load_failed", err)
 	}
-	configuration, err := config.Decode(bytes.NewReader(configData))
+	configuration, err := config.DecodeRelativeTo(bytes.NewReader(configData), *configPath)
 	if err != nil {
 		return newCommandError("config_load_failed", err)
 	}

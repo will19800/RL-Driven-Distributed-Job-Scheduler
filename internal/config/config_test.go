@@ -101,6 +101,59 @@ func TestLoadSyntheticConfigurationDeterministically(t *testing.T) {
 	}
 }
 
+func TestLoadTraceConfigurationRelativeToConfig(t *testing.T) {
+	t.Parallel()
+	path := filepath.Join("..", "..", "configs", "experiments", "trace-smoke.yaml")
+	configuration, err := Load(path)
+	if err != nil {
+		t.Fatalf("Load(%q): %v", path, err)
+	}
+	_, jobs, err := configuration.DomainValues()
+	if err != nil {
+		t.Fatalf("DomainValues(): %v", err)
+	}
+	if len(jobs) != 4 || jobs[2].Request.GPUs != 1 {
+		t.Fatalf("trace jobs = %+v, want four jobs including a GPU job", jobs)
+	}
+}
+
+func TestDecodeBurstyWorkload(t *testing.T) {
+	t.Parallel()
+	input := strings.Replace(validYAML(), `  jobs:
+    - id: job-1
+      submit_time: 250ms
+      resources:
+        cpu_millis: 500
+        memory_mib: 1024
+        gpus: 0
+        ephemeral_disk_mib: 100
+      duration: 5s
+      priority: 2
+      deadline: 10s`, `  synthetic:
+    count: 4
+    start_time: 0s
+    arrival_phases:
+      - name: quiet
+        count: 2
+        rate_per_second: 1
+      - name: burst
+        count: 2
+        rate_per_second: 10
+    duration: {median: 1s, sigma: 0, min: 1s, max: 1s}
+    profiles:
+      - name: balanced
+        weight: 1
+        resources: {cpu_millis: 500, memory_mib: 512}`, 1)
+	configuration, err := Decode(strings.NewReader(input))
+	if err != nil {
+		t.Fatalf("Decode(): %v", err)
+	}
+	_, jobs, err := configuration.DomainValues()
+	if err != nil || len(jobs) != 4 {
+		t.Fatalf("DomainValues() = %d jobs, %v; want 4", len(jobs), err)
+	}
+}
+
 func TestDecodeRejectsUnknownFieldsAtEveryLevel(t *testing.T) {
 	t.Parallel()
 	tests := map[string]string{
@@ -154,6 +207,10 @@ func TestValidateRejectsDuplicateIDsAndEmptyCollections(t *testing.T) {
 		"no jobs":        func(c *Config) { c.Workload.Jobs = nil },
 		"both workload sources": func(c *Config) {
 			c.Workload.Synthetic = &SyntheticWorkloadConfig{}
+		},
+		"three workload sources": func(c *Config) {
+			c.Workload.Synthetic = &SyntheticWorkloadConfig{}
+			c.Workload.Trace = &TraceWorkloadConfig{Path: "jobs.csv"}
 		},
 	}
 	for name, mutate := range tests {
