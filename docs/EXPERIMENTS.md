@@ -55,3 +55,43 @@ Each record identifies the source configuration and relative bundle path.
 On failure, the command cancels outstanding work and returns a nonzero status.
 Completed bundles remain for diagnosis, but the absent `matrix.json` makes the
 incomplete experiment unambiguous. Choose a new output directory to rerun.
+
+## Statistical comparison report
+
+Analyze a completed matrix against a baseline policy with:
+
+```bash
+python3 -m scheduler_rl analyze results/paired-smoke/matrix.json \
+  --baseline first-fit \
+  --output results/paired-smoke-analysis \
+  --bootstrap-samples 10000 \
+  --seed 2026
+```
+
+The analyzer requires an identical seed set for the baseline and every compared
+policy within each workload. It computes paired per-seed improvements for:
+
+- throughput;
+- p99 latency;
+- mean queue depth;
+- CPU utilization;
+- bounded-slowdown Jain fairness; and
+- deadline violation rate.
+
+Improvement is direction-normalized: positive values always favor the compared
+policy. For latency, queue depth, and deadline violations this means baseline
+minus candidate; for the other metrics it means candidate minus baseline.
+
+Each mean improvement receives a two-sided 95% percentile interval from paired
+bootstrap resampling. Random streams are deterministically derived from the
+requested seed plus the workload, policy, and metric, so results do not depend
+on iteration order. For credible claims, use at least 20 paired seeds and
+increase the resample count after power analysis; the two-seed smoke matrix only
+tests the pipeline.
+
+The output directory is never overwritten and contains:
+
+- `analysis.json`: versioned machine-readable comparisons;
+- `comparisons.csv`: flat table for downstream tools;
+- `report.md`: a human-readable comparison table; and
+- `plots/*.svg`: dependency-free confidence-interval plots for every metric.

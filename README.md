@@ -76,6 +76,18 @@ This runs five baseline policies on identical steady and bursty workloads for
 two seeds, with at most two simulations active at once. Outputs are isolated by
 workload, seed, and policy beneath `results/paired-smoke`.
 
+Generate a deterministic paired comparison report with:
+
+```bash
+python3 -m scheduler_rl analyze results/paired-smoke/matrix.json \
+  --baseline first-fit \
+  --output results/paired-smoke-analysis
+```
+
+The report includes machine-readable JSON/CSV, a Markdown table, and SVG plots
+with paired bootstrap confidence intervals. The smoke matrix verifies the
+pipeline; it is too small to support performance claims.
+
 ## Development commands
 
 Run `make help` to list all supported commands. The main workflow is:
