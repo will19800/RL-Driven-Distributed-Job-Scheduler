@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/config"
@@ -21,7 +22,7 @@ import (
 )
 
 const usage = `Usage:
-  scheduler-sim run --config PATH [--output PATH] [--results-dir DIR] [--policy POLICY]
+  scheduler-sim run --config PATH [--output PATH] [--results-dir DIR] [--policy POLICY] [--seed SEED]
   scheduler-sim --version
 
 Policies: first-fit, round-robin, random-fit, least-loaded, bin-pack
@@ -71,6 +72,8 @@ func runCommand(ctx context.Context, args []string, stdout io.Writer) *commandEr
 	outputPath := flags.String("output", "-", "summary output path, or - for stdout")
 	resultsDir := flags.String("results-dir", "", "write a versioned detailed result bundle")
 	policy := flags.String("policy", "first-fit", "scheduling policy")
+	seedOverride := ""
+	flags.StringVar(&seedOverride, "seed", "", "override the configuration seed")
 	if err := flags.Parse(args); err != nil {
 		return newCommandError("usage", err)
 	}
@@ -88,6 +91,13 @@ func runCommand(ctx context.Context, args []string, stdout io.Writer) *commandEr
 	configuration, err := config.DecodeRelativeTo(bytes.NewReader(configData), *configPath)
 	if err != nil {
 		return newCommandError("config_load_failed", err)
+	}
+	if seedOverride != "" {
+		seed, parseErr := strconv.ParseInt(seedOverride, 10, 64)
+		if parseErr != nil {
+			return newCommandError("usage", fmt.Errorf("invalid --seed %q: %w", seedOverride, parseErr))
+		}
+		configuration.Seed = seed
 	}
 	nodes, jobs, err := configuration.DomainValues()
 	if err != nil {

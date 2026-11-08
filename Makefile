@@ -54,6 +54,7 @@ build: ## Build both Go command-line programs.
 	mkdir -p "$(BUILD_DIR)"
 	$(GO) build -o "$(BUILD_DIR)/scheduler-sim" ./cmd/scheduler-sim
 	$(GO) build -o "$(BUILD_DIR)/result-check" ./cmd/result-check
+	$(GO) build -o "$(BUILD_DIR)/experiment-run" ./cmd/experiment-run
 
 train-smoke: ## Check that the Python training package starts.
 	$(PYTHON) -m scheduler_rl

@@ -141,6 +141,22 @@ func TestRunCLIAcceptsBinPackAlias(t *testing.T) {
 	}
 }
 
+func TestRunCLIOverridesSeed(t *testing.T) {
+	t.Parallel()
+	var stdout, stderr bytes.Buffer
+	code := runCLI(context.Background(), []string{"run", "--config", filepath.Join("..", "..", "configs", "experiments", "synthetic-smoke.yaml"), "--seed", "99"}, &stdout, &stderr)
+	if code != 0 {
+		t.Fatalf("runCLI() code = %d, stderr = %s", code, stderr.String())
+	}
+	var summary resultSummary
+	if err := json.Unmarshal(stdout.Bytes(), &summary); err != nil {
+		t.Fatal(err)
+	}
+	if summary.Seed != 99 {
+		t.Fatalf("summary seed = %d, want 99", summary.Seed)
+	}
+}
+
 func TestRunCLIReturnsStructuredErrors(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
@@ -152,6 +168,7 @@ func TestRunCLIReturnsStructuredErrors(t *testing.T) {
 		{"missing command", nil, 2, "usage"},
 		{"missing config flag", []string{"run"}, 2, "usage"},
 		{"unknown policy", []string{"run", "--config", smokeConfigPath(), "--policy", "unknown"}, 2, "usage"},
+		{"invalid seed", []string{"run", "--config", smokeConfigPath(), "--seed", "nope"}, 2, "usage"},
 		{"missing config file", []string{"run", "--config", filepath.Join(t.TempDir(), "missing.yaml")}, 1, "config_load_failed"},
 		{"bad output path", []string{"run", "--config", smokeConfigPath(), "--output", filepath.Join(t.TempDir(), "missing", "summary.json")}, 1, "result_write_failed"},
 	}

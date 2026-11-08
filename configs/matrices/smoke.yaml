@@ -1,0 +1,10 @@
+schema_version: v1
+output_dir: ../../results/paired-smoke
+workers: 2
+seeds: [41, 42]
+policies: [first-fit, round-robin, random-fit, least-loaded, bin-pack]
+workloads:
+  - name: steady
+    config: ../experiments/synthetic-smoke.yaml
+  - name: bursty
+    config: ../experiments/bursty.yaml

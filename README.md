@@ -14,7 +14,8 @@ milestones, validation rules, and ordered commit roadmap. The
 [configuration reference](docs/CONFIGURATION.md) documents the strict v1 YAML
 schema, burst and heterogeneous suites, and CSV/JSON trace ingestion. The
 [result bundle reference](docs/RESULTS.md) defines output schemas and integrity
-checks.
+checks. The [experiment matrix guide](docs/EXPERIMENTS.md) covers paired,
+bounded-parallel policy comparisons across workloads and seeds.
 
 ## Prerequisites
 
@@ -64,6 +65,16 @@ go run ./cmd/result-check results/smoke
 Result directories are never overwritten. Each bundle contains a versioned
 manifest, summary, per-job CSV, and event-aligned time-series CSV with SHA-256
 integrity checks.
+
+Run the paired smoke matrix after building the binaries:
+
+```bash
+./bin/experiment-run configs/matrices/smoke.yaml
+```
+
+This runs five baseline policies on identical steady and bursty workloads for
+two seeds, with at most two simulations active at once. Outputs are isolated by
+workload, seed, and policy beneath `results/paired-smoke`.
 
 ## Development commands
 
