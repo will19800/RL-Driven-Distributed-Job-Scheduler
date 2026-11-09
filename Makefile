@@ -17,7 +17,7 @@ export PYTHONPATH
 .DEFAULT_GOAL := help
 
 .PHONY: help fmt fmt-check docs-check lint test test-go test-python build \
-	train-smoke benchmark-smoke analysis-smoke clean
+	train-smoke environment-smoke benchmark-smoke analysis-smoke clean
 
 help: ## Show available development commands.
 	@awk 'BEGIN {FS = ":.*## "} /^[a-zA-Z0-9_-]+:.*## / {printf "  %-18s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -58,6 +58,9 @@ build: ## Build both Go command-line programs.
 
 train-smoke: ## Check that the Python training package starts.
 	$(PYTHON) -m scheduler_rl
+
+environment-smoke: ## Run deterministic training-environment tests.
+	$(PYTHON) -m unittest python.tests.test_environment -v
 
 benchmark-smoke: ## Run the deterministic smoke simulation.
 	$(GO) run ./cmd/scheduler-sim run --config configs/experiments/smoke.yaml

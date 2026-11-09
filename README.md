@@ -18,6 +18,8 @@ checks. The [experiment matrix guide](docs/EXPERIMENTS.md) covers paired,
 bounded-parallel policy comparisons across workloads and seeds. The
 [`policy/v1` contract](docs/POLICY_V1.md) fixes cross-language RL features,
 normalization, candidate ordering, masks, and action indexing.
+The [seeded training environment](docs/TRAINING_ENVIRONMENT.md) defines the
+event, reset, step, termination, and reproducibility semantics used by RL code.
 
 ## Prerequisites
 
