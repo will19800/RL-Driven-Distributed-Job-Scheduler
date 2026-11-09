@@ -1,0 +1,92 @@
+{
+  "config": {
+    "max_jobs": 3,
+    "max_nodes": 3,
+    "normalization": {
+      "cpu_millis": 4000,
+      "memory_mib": 8000,
+      "gpus": 2,
+      "ephemeral_disk_mib": 2000,
+      "duration_seconds": 100,
+      "priority": 10,
+      "queue_length": 10,
+      "arrival_rate": 10,
+      "simulation_time_seconds": 100
+    }
+  },
+  "state": {
+    "now_seconds": 10,
+    "arrival_rate": 5,
+    "nodes": [
+      {
+        "id": "node-b",
+        "capacity": {"cpu_millis": 4000, "memory_mib": 8000, "gpus": 0, "ephemeral_disk_mib": 1000},
+        "allocated": {"cpu_millis": 1000, "memory_mib": 2000, "gpus": 0, "ephemeral_disk_mib": 0},
+        "state": "available"
+      },
+      {
+        "id": "node-a",
+        "capacity": {"cpu_millis": 2000, "memory_mib": 4000, "gpus": 1, "ephemeral_disk_mib": 500},
+        "allocated": {"cpu_millis": 2000, "memory_mib": 1000, "gpus": 0, "ephemeral_disk_mib": 100},
+        "state": "unavailable"
+      }
+    ],
+    "jobs": [
+      {
+        "id": "job-low", "submit_time_seconds": 2,
+        "request": {"cpu_millis": 3000, "memory_mib": 1000, "gpus": 0, "ephemeral_disk_mib": 0},
+        "duration_seconds": 20, "priority": 0, "deadline_seconds": null, "state": "queued"
+      },
+      {
+        "id": "job-running", "submit_time_seconds": 1,
+        "request": {"cpu_millis": 1000, "memory_mib": 1000, "gpus": 0, "ephemeral_disk_mib": 0},
+        "duration_seconds": 50, "priority": 9, "deadline_seconds": null, "state": "running"
+      },
+      {
+        "id": "job-high", "submit_time_seconds": 5,
+        "request": {"cpu_millis": 1000, "memory_mib": 1000, "gpus": 0, "ephemeral_disk_mib": 100},
+        "duration_seconds": 30, "priority": 2, "deadline_seconds": 12, "state": "queued"
+      }
+    ]
+  },
+  "expected_schema": {
+    "version": "policy/v1",
+    "max_jobs": 3,
+    "max_nodes": 3,
+    "node_features": ["free_cpu", "free_memory", "free_gpu", "free_disk", "total_cpu", "total_memory", "total_gpu", "total_disk", "available", "utilization_cpu", "utilization_memory", "utilization_gpu", "utilization_disk"],
+    "job_features": ["request_cpu", "request_memory", "request_gpu", "request_disk", "age", "duration", "priority", "deadline_slack", "has_deadline"],
+    "global_features": ["queue_length", "utilization_cpu", "utilization_memory", "utilization_gpu", "utilization_disk", "arrival_rate", "simulation_time"],
+    "normalization": {
+      "cpu_millis": 4000,
+      "memory_mib": 8000,
+      "gpus": 2,
+      "ephemeral_disk_mib": 2000,
+      "duration_seconds": 100,
+      "priority": 10,
+      "queue_length": 10,
+      "arrival_rate": 10,
+      "simulation_time_seconds": 100
+    },
+    "placement_action_count": 9,
+    "defer_action": 9
+  },
+  "expected": {
+    "version": "policy/v1",
+    "node_features": [
+      [0, 0.375, 0.5, 0.2, 0.5, 0.5, 0.5, 0.25, 0, 1, 0.25, 0, 0.2],
+      [0.75, 0.75, 0, 0.5, 1, 1, 0, 0.5, 1, 0.25, 0.25, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ],
+    "job_features": [
+      [0.25, 0.125, 0, 0.05, 0.05, 0.3, 0.2, 0.02, 1],
+      [0.75, 0.125, 0, 0, 0.08, 0.2, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ],
+    "global_features": [0.2, 0.5, 0.25, 0, 0.06666666666666667, 0.5, 0.1],
+    "node_mask": [true, true, false],
+    "job_mask": [true, true, false],
+    "action_mask": [false, true, false, false, true, false, false, false, false, true],
+    "node_ids": ["node-a", "node-b", ""],
+    "job_ids": ["job-high", "job-low", ""]
+  }
+}

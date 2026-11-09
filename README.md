@@ -15,7 +15,9 @@ milestones, validation rules, and ordered commit roadmap. The
 schema, burst and heterogeneous suites, and CSV/JSON trace ingestion. The
 [result bundle reference](docs/RESULTS.md) defines output schemas and integrity
 checks. The [experiment matrix guide](docs/EXPERIMENTS.md) covers paired,
-bounded-parallel policy comparisons across workloads and seeds.
+bounded-parallel policy comparisons across workloads and seeds. The
+[`policy/v1` contract](docs/POLICY_V1.md) fixes cross-language RL features,
+normalization, candidate ordering, masks, and action indexing.
 
 ## Prerequisites
 
