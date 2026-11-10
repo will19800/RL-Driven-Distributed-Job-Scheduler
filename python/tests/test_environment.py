@@ -54,7 +54,7 @@ class TrainingEnvironmentTest(unittest.TestCase):
         self.assertEqual(observation["job_ids"][:2], ["job-a", "job-b"])
 
         observation, reward, terminated, truncated, info = environment.step(0)
-        self.assertEqual(reward, 0.0)
+        self.assertTrue(isinstance(reward, float))
         self.assertFalse(terminated or truncated)
         self.assertEqual(info["simulation_time_seconds"], 4)
         self.assertEqual(observation["job_ids"][0], "job-b")

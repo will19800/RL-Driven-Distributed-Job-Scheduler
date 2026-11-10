@@ -5,7 +5,8 @@ Go simulation core and Python reinforcement-learning tooling.
 
 The project currently has a deterministic simulator and four baseline
 schedulers, and is moving into its experiment and measurement platform. The RL
-training pipeline and performance benchmarks remain planned. Earlier references
+training pipeline now supports smoke PPO training and versioned export;
+scale performance benchmarks remain planned. Earlier references
 to a 27% p99 latency reduction and an 18% utilization improvement are target
 hypotheses; no repository evidence currently validates those figures.
 
@@ -20,6 +21,8 @@ bounded-parallel policy comparisons across workloads and seeds. The
 normalization, candidate ordering, masks, and action indexing.
 The [seeded training environment](docs/TRAINING_ENVIRONMENT.md) defines the
 event, reset, step, termination, and reproducibility semantics used by RL code.
+The [training guide](docs/TRAINING.md) covers decomposed rewards, batched PPO,
+checkpoint/resume, validation selection, and versioned TorchScript export.
 
 ## Prerequisites
 
@@ -38,7 +41,8 @@ not yet require third-party dependencies.
 | M1 — Deterministic simulator vertical slice | Complete |
 | M2 — Baseline scheduler suite | Complete |
 | M3 — Experiment and measurement platform | In progress (aggregate metrics available) |
-| M4–M7 — RL, evidence, and release | Planned |
+| M4 — RL environment, training, and export | Smoke pipeline implemented |
+| M5–M7 — Go inference, evidence, and release | Planned |
 
 ## Run the smoke simulation
 

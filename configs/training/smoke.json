@@ -1,0 +1,36 @@
+{
+  "policy": {
+    "max_jobs": 4,
+    "max_nodes": 2,
+    "normalization": {
+      "cpu_millis": 4000,
+      "memory_mib": 8192,
+      "gpus": 1,
+      "ephemeral_disk_mib": 1024,
+      "duration_seconds": 10,
+      "priority": 10,
+      "queue_length": 10,
+      "arrival_rate": 10,
+      "simulation_time_seconds": 100
+    }
+  },
+  "episode": {
+    "node_count": 2,
+    "node_capacity": {"cpu_millis": 2000, "memory_mib": 4096, "gpus": 0, "ephemeral_disk_mib": 1024},
+    "job_count": 12,
+    "arrival_rate": 2,
+    "duration_min": 1,
+    "duration_max": 5,
+    "request": {"cpu_millis": 1000, "memory_mib": 1024, "gpus": 0, "ephemeral_disk_mib": 0}
+  },
+  "reward": {"throughput": 1, "queue": 0.1, "slowdown": 0.1, "fragmentation": 0.01, "sla": 1, "invalid": 1, "time_scale": 10, "slowdown_clip": 100},
+  "seed": 42,
+  "updates": 3,
+  "workers": 2,
+  "rollout_steps": 16,
+  "epochs": 2,
+  "learning_rate": 0.0003,
+  "gamma": 0.99,
+  "validation_seeds": [1000001, 1000002],
+  "max_episode_steps": 100
+}

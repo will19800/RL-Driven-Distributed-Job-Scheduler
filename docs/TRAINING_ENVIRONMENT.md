@@ -10,9 +10,9 @@ observation, info = environment.reset(seed=42)
 observation, reward, terminated, truncated, info = environment.step(action)
 ```
 
-The reward is exactly zero until the decomposed reward contract is introduced
-in the next milestone commit. Training code must not interpret this temporary
-value as a useful objective.
+Rewards now expose throughput, integrated queue wait, completed-job slowdown,
+integrated fragmentation, deadline misses, and invalid-action diagnostics. See
+the [training guide](TRAINING.md) for weights, normalization, and PPO commands.
 
 ## Event and decision semantics
 

@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from typing import Any, Callable
 
 from scheduler_rl.policy_v1 import ContractError, RESOURCE_KEYS, decode_action, encode
+from scheduler_rl.reward import RewardConfig, empty_terms
 
 
 class EnvironmentError(ValueError):
@@ -59,12 +60,11 @@ class SyntheticEpisodeFactory:
 class TrainingEnvironment:
     """Gymnasium-style event environment with deterministic reset and step.
 
-    The reward is deliberately zero until the decomposed reward contract is
-    introduced. Step returns ``(observation, reward, terminated, truncated,
+    Step returns ``(observation, reward, terminated, truncated,
     info)`` and reset returns ``(observation, info)``.
     """
 
-    def __init__(self, policy_config: dict[str, Any], episode_factory: Callable[[int], Episode], arrival_window_seconds: float = 60.0):
+    def __init__(self, policy_config: dict[str, Any], episode_factory: Callable[[int], Episode], arrival_window_seconds: float = 60.0, reward_config: RewardConfig | None = None):
         if not callable(episode_factory):
             raise EnvironmentError("episode_factory must be callable")
         if isinstance(arrival_window_seconds, bool) or not isinstance(arrival_window_seconds, (int, float)) or not math.isfinite(arrival_window_seconds) or arrival_window_seconds <= 0:
@@ -74,6 +74,8 @@ class TrainingEnvironment:
         self.arrival_window_seconds = float(arrival_window_seconds)
         self._initialized = False
         self._done = False
+        self.reward_config = reward_config or RewardConfig()
+        self.reward_config.validate()
 
     def reset(self, *, seed: int | None = None, options: dict[str, Any] | None = None) -> tuple[dict[str, Any], dict[str, Any]]:
         if options not in (None, {}):
@@ -91,12 +93,15 @@ class TrainingEnvironment:
         self.events: list[tuple[float, int, str, str]] = []
         self.sequence = 0
         self.arrivals: list[float] = []
+        self.reward_terms = empty_terms()
+        self.reward_totals = empty_terms()
         self._validate_episode(episode)
         for job in copy.deepcopy(episode.jobs):
             self.pending[job["id"]] = job
             self._schedule(job["submit_time_seconds"], "submit", job["id"])
         self._initialized, self._done = True, False
         self._advance(force_event=True)
+        self.reward_terms = empty_terms()
         observation = self._observation()
         return observation, self._info()
 
@@ -106,9 +111,12 @@ class TrainingEnvironment:
         if self._done:
             raise EnvironmentError("step called after episode finished")
         observation = self._observation()
+        self.reward_terms = empty_terms()
         try:
             action = decode_action(self.policy_config, observation, action_index)
         except ContractError as error:
+            self.reward_terms["invalid"] = -1.0
+            self.reward_totals["invalid"] -= 1.0
             raise EnvironmentError(str(error)) from error
         self.steps += 1
         if action["defer"]:
@@ -124,7 +132,12 @@ class TrainingEnvironment:
         info = self._info()
         if truncated:
             info["truncation_reason"] = "unschedulable_queue"
-        return self._observation(), 0.0, terminated, truncated, info
+            self.reward_terms["queue"] -= sum(job["state"] == "queued" for job in self.jobs.values())
+        for key, value in self.reward_terms.items():
+            self.reward_totals[key] += value
+        info["reward_terms"] = dict(self.reward_terms)
+        info["reward_totals"] = dict(self.reward_totals)
+        return self._observation(), self.reward_config.weighted(self.reward_terms), terminated, truncated, info
 
     def _validate_episode(self, episode: Episode) -> None:
         if not episode.nodes or not episode.jobs:
@@ -165,6 +178,13 @@ class TrainingEnvironment:
 
     def _process_next_time(self) -> None:
         when = self.events[0][0]
+        elapsed = when - self.now
+        self.reward_terms["queue"] -= elapsed * sum(job["state"] == "queued" for job in self.jobs.values()) / self.reward_config.time_scale
+        spreads = []
+        for node in self.nodes:
+            free = [1 - node["allocated"][key] / node["capacity"][key] for key in RESOURCE_KEYS if node["capacity"][key]]
+            spreads.append(max(free) - min(free))
+        self.reward_terms["fragmentation"] -= elapsed * sum(spreads) / len(spreads) / self.reward_config.time_scale
         self.now = when
         while self.events and self.events[0][0] == when:
             _, _, kind, job_id = heapq.heappop(self.events)
@@ -174,6 +194,11 @@ class TrainingEnvironment:
                 job = self.jobs[job_id]; node = self._node(job["assigned_node"])
                 for key in RESOURCE_KEYS: node["allocated"][key] -= job["request"][key]
                 job["state"] = "completed"; job["end_time_seconds"] = when; self.completed += 1
+                self.reward_terms["throughput"] += 1
+                slowdown = (when - job["submit_time_seconds"]) / max(job["duration_seconds"], 1.0)
+                self.reward_terms["slowdown"] -= min(self.reward_config.slowdown_clip, max(1.0, slowdown)) / self.reward_config.slowdown_clip
+                if job["deadline_seconds"] is not None and when > job["deadline_seconds"]:
+                    self.reward_terms["sla"] -= 1
             else:
                 raise EnvironmentError(f"unknown event {kind!r}")
 

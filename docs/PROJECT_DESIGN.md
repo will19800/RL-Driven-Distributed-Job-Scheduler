@@ -548,6 +548,11 @@ Each commit should be independently reviewable and leave the branch buildable. T
 
 ## 16. How to work through the plan
 
+User-approved consolidation after commit 21: deliver the seven remaining items
+as three reviewable commits: 22–24 (reward/training/export), 25–26
+(inference/safety), and 27–28 (scale evidence/release documentation). The original
+numbered entries remain the acceptance scope for each batch.
+
 Implement one numbered commit at a time. Before each commit:
 
 1. Reconfirm its acceptance scope and dependencies.
