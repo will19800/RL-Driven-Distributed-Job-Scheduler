@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime/pprof"
+	"sort"
 	"strconv"
 	"time"
 
@@ -78,6 +80,7 @@ func runCommand(ctx context.Context, args []string, stdout io.Writer) *commandEr
 	python := flags.String("python", "python3", "Python interpreter with training extra installed")
 	inferenceTimeout := flags.Duration("inference-timeout", 250*time.Millisecond, "per-decision inference budget")
 	fallbackName := flags.String("fallback", "bin-pack", "fallback baseline policy")
+	cpuProfile := flags.String("cpu-profile", "", "write a CPU profile (profiling runs only)")
 	seedOverride := ""
 	flags.StringVar(&seedOverride, "seed", "", "override the configuration seed")
 	if err := flags.Parse(args); err != nil {
@@ -90,6 +93,17 @@ func runCommand(ctx context.Context, args []string, stdout io.Writer) *commandEr
 		return newCommandError("usage", fmt.Errorf("unexpected arguments: %v", flags.Args()))
 	}
 	startedAt := time.Now()
+	if *cpuProfile != "" {
+		file, err := os.OpenFile(*cpuProfile, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0644)
+		if err != nil {
+			return newCommandError("profile_failed", err)
+		}
+		if err := pprof.StartCPUProfile(file); err != nil {
+			file.Close()
+			return newCommandError("profile_failed", err)
+		}
+		defer func() { pprof.StopCPUProfile(); _ = file.Close() }()
+	}
 	configData, err := os.ReadFile(*configPath)
 	if err != nil {
 		return newCommandError("config_load_failed", err)
@@ -112,6 +126,16 @@ func runCommand(ctx context.Context, args []string, stdout io.Writer) *commandEr
 	simulation, err := simulator.NewSimulation(nodes, jobs)
 	if err != nil {
 		return newCommandError("simulation_init_failed", err)
+	}
+	outages := append([]config.OutageConfig(nil), configuration.Outages...)
+	sort.SliceStable(outages, func(i, j int) bool { return outages[i].FailAt.Duration < outages[j].FailAt.Duration })
+	for _, outage := range outages {
+		if _, err := simulation.ScheduleAvailability(outage.FailAt.Duration, domain.NodeID(outage.NodeID), false); err != nil {
+			return newCommandError("simulation_init_failed", err)
+		}
+		if _, err := simulation.ScheduleAvailability(outage.RecoverAt.Duration, domain.NodeID(outage.NodeID), true); err != nil {
+			return newCommandError("simulation_init_failed", err)
+		}
 	}
 	var selectedPolicy scheduler.Policy
 	var rlPolicy *inference.Policy

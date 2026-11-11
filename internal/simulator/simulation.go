@@ -92,6 +92,21 @@ func (s *Simulation) Now() time.Duration { return s.clock.Now() }
 // PendingEvents returns the number of events waiting to be processed.
 func (s *Simulation) PendingEvents() int { return s.events.Len() }
 
+// ScheduleAvailability queues a deterministic failure or recovery transition.
+func (s *Simulation) ScheduleAvailability(at time.Duration, id domain.NodeID, available bool) (Event, error) {
+	if at < s.Now() {
+		return Event{}, ErrTimeReversal
+	}
+	if _, exists := s.nodes[id]; !exists {
+		return Event{}, ErrNodeNotFound
+	}
+	kind := EventNodeFailed
+	if available {
+		kind = EventNodeRecovered
+	}
+	return s.events.Schedule(Event{Time: at, Type: kind, NodeID: id})
+}
+
 // NextEvent returns the next event without consuming it.
 func (s *Simulation) NextEvent() (Event, bool) { return s.events.Peek() }
 
@@ -276,6 +291,11 @@ func applyEvent(event Event, nodes map[domain.NodeID]domain.Node, jobs, pending 
 		if !exists {
 			return nil, fmt.Errorf("%w: active job %q", ErrJobNotFound, event.JobID)
 		}
+		// A failure already ended this job and released its allocation. The
+		// previously queued completion is now a harmless stale event.
+		if job.State == domain.JobStateRejected && job.RejectionReason == "node_failed" {
+			return nil, nil
+		}
 		if job.State != domain.JobStateRunning || job.AssignedNode != event.NodeID {
 			return nil, fmt.Errorf("%w: completion does not match running job %q", ErrInvalidTransition, job.ID)
 		}
@@ -297,7 +317,35 @@ func applyEvent(event Event, nodes map[domain.NodeID]domain.Node, jobs, pending 
 	case EventSchedulingTick:
 		return nil, nil
 	case EventNodeFailed, EventNodeRecovered:
-		return nil, fmt.Errorf("%w: %s", ErrUnsupportedEvent, event.Type)
+		node, exists := nodes[event.NodeID]
+		if !exists {
+			return nil, ErrNodeNotFound
+		}
+		if event.Type == EventNodeRecovered {
+			if node.State != domain.NodeStateUnavailable {
+				return nil, ErrInvalidTransition
+			}
+			node.State = domain.NodeStateAvailable
+		} else {
+			if node.State != domain.NodeStateAvailable {
+				return nil, ErrInvalidTransition
+			}
+			node.State = domain.NodeStateUnavailable
+			for id, job := range jobs {
+				if job.State == domain.JobStateRunning && job.AssignedNode == node.ID {
+					end := event.Time
+					job.State = domain.JobStateRejected
+					job.AssignedNode = ""
+					job.StartTime = nil
+					job.EndTime = &end
+					job.RejectionReason = "node_failed"
+					jobs[id] = job
+				}
+			}
+			node.Allocated = domain.ResourceVector{}
+		}
+		nodes[event.NodeID] = node
+		return nil, nil
 	default:
 		return nil, fmt.Errorf("%w: %s", ErrUnsupportedEvent, event.Type)
 	}

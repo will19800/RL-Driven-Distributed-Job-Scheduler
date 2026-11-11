@@ -1,0 +1,19 @@
+File: scheduler-sim
+Type: cpu
+Time: 2026-11-11 18:54:12 EST
+Duration: 802.77ms, Total samples = 890ms (110.87%)
+Showing nodes accounting for 880ms, 98.88% of 890ms total
+Showing top 12 nodes out of 83
+      flat  flat%   sum%        cum   cum%
+     430ms 48.31% 48.31%      430ms 48.31%  runtime.kevent
+      90ms 10.11% 58.43%       90ms 10.11%  runtime.madvise
+      90ms 10.11% 68.54%       90ms 10.11%  runtime.pthread_cond_wait
+      70ms  7.87% 76.40%       70ms  7.87%  runtime.usleep
+      60ms  6.74% 83.15%       60ms  6.74%  runtime.pthread_kill
+      50ms  5.62% 88.76%       50ms  5.62%  runtime.pthread_cond_signal
+      20ms  2.25% 91.01%       20ms  2.25%  github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/simulator.(*Simulation).Jobs.func1
+      20ms  2.25% 93.26%       20ms  2.25%  runtime.pthread_cond_timedwait_relative_np
+      20ms  2.25% 95.51%       20ms  2.25%  runtime.tryDeferToSpanScan
+      10ms  1.12% 96.63%       10ms  1.12%  runtime.(*spanQueue).refill
+      10ms  1.12% 97.75%       10ms  1.12%  runtime.memmove
+      10ms  1.12% 98.88%       10ms  1.12%  runtime.typePointers.next

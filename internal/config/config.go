@@ -48,11 +48,18 @@ func (d *Duration) UnmarshalYAML(node *yaml.Node) error {
 
 // Config is the root of the v1 simulation configuration schema.
 type Config struct {
+	Outages       []OutageConfig `yaml:"outages,omitempty"`
 	SchemaVersion string         `yaml:"schema_version"`
 	Seed          int64          `yaml:"seed"`
 	Cluster       ClusterConfig  `yaml:"cluster"`
 	Workload      WorkloadConfig `yaml:"workload"`
 	baseDir       string
+}
+
+type OutageConfig struct {
+	NodeID    string   `yaml:"node_id"`
+	FailAt    Duration `yaml:"fail_at"`
+	RecoverAt Duration `yaml:"recover_at"`
 }
 
 // ClusterConfig defines the initial cluster.
@@ -229,6 +236,19 @@ func (c Config) DomainValues() ([]domain.Node, []domain.Job, error) {
 		nodes = append(nodes, node)
 	}
 
+	if len(c.Outages) > 10000 {
+		return nil, nil, fmt.Errorf("%w: too many outages", ErrInvalidConfig)
+	}
+	for index, outage := range c.Outages {
+		if _, exists := nodeIDs[domain.NodeID(outage.NodeID)]; !exists || outage.FailAt.Duration < 0 || outage.RecoverAt.Duration <= outage.FailAt.Duration {
+			return nil, nil, fmt.Errorf("%w: invalid outage %d", ErrInvalidConfig, index)
+		}
+		for _, earlier := range c.Outages[:index] {
+			if earlier.NodeID == outage.NodeID && outage.FailAt.Duration < earlier.RecoverAt.Duration && earlier.FailAt.Duration < outage.RecoverAt.Duration {
+				return nil, nil, fmt.Errorf("%w: overlapping outages", ErrInvalidConfig)
+			}
+		}
+	}
 	if c.Workload.Synthetic != nil {
 		spec := syntheticSpec(*c.Workload.Synthetic)
 		jobs, err := workload.Generate(c.Seed, spec)

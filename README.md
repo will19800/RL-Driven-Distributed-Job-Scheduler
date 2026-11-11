@@ -3,12 +3,13 @@
 A research-oriented distributed cluster scheduler simulator being built with a
 Go simulation core and Python reinforcement-learning tooling.
 
-The project currently has a deterministic simulator and four baseline
-schedulers, and is moving into its experiment and measurement platform. The RL
-training pipeline now supports smoke PPO training and versioned export;
-scale performance benchmarks remain planned. Earlier references
+The project includes a deterministic simulator, four baseline schedulers,
+paired experiment analysis, smoke PPO training/export, and Go inference with
+validated fallback. A reproducible synthetic benchmark compares six policies
+on 200- and 240-node clusters. Earlier references
 to a 27% p99 latency reduction and an 18% utilization improvement are target
-hypotheses; no repository evidence currently validates those figures.
+hypotheses; the [measured report](benchmarks/v0.1/README.md) documents the actual
+evidence and its limits.
 
 See [the design and delivery plan](docs/PROJECT_DESIGN.md) for the architecture,
 milestones, validation rules, and ordered commit roadmap. The
@@ -25,6 +26,8 @@ The [training guide](docs/TRAINING.md) covers decomposed rewards, batched PPO,
 checkpoint/resume, validation selection, and versioned TorchScript export.
 The [inference guide](docs/INFERENCE.md) covers Go model execution, timeouts,
 validated fallback, and runtime diagnostics.
+The [v0.1 release guide](docs/RELEASE.md) provides installation, one-command
+benchmark reproduction, limitations, and the remaining publication checklist.
 
 ## Prerequisites
 
@@ -42,10 +45,11 @@ not yet require third-party dependencies.
 | M0 — Truthful project foundation | Complete |
 | M1 — Deterministic simulator vertical slice | Complete |
 | M2 — Baseline scheduler suite | Complete |
-| M3 — Experiment and measurement platform | In progress (aggregate metrics available) |
+| M3 — Experiment and measurement platform | Complete |
 | M4 — RL environment, training, and export | Smoke pipeline implemented |
 | M5 — Go inference and safety | Implemented with process bridge |
-| M6–M7 — Scale evidence and release | Planned |
+| M6 — Scale evidence | Synthetic 200-plus-node suite measured; research limits documented |
+| M7 — Release hardening | Candidate guide prepared; hosted CI and publication gates remain |
 
 ## Run the smoke simulation
 

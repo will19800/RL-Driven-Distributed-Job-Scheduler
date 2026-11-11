@@ -25,6 +25,26 @@ values are rejected because their unit would be ambiguous.
 See [`configs/experiments/smoke.yaml`](../configs/experiments/smoke.yaml) for a
 complete configuration that is validated in the test suite.
 
+## Node outages
+
+Optional root-level `outages` entries contain `node_id`, `fail_at`, and
+`recover_at`. Times use the same duration syntax as job submissions. Referenced
+nodes must exist, recovery must follow failure, and outage intervals on a node
+must not overlap. At most 10,000 intervals are allowed.
+
+```yaml
+outages:
+  - node_id: node-1
+    fail_at: 5s
+    recover_at: 15s
+```
+
+A failure rejects jobs currently running on the node with `node_failed` and
+releases their allocation. Queued jobs remain queued and may use other nodes.
+Recovery re-enables placements. Jobs are not automatically retried. Previously
+queued completion events for failed jobs are consumed without releasing
+resources twice. These model fail-stop outages, not checkpoint migration.
+
 ## Synthetic workloads
 
 `workload.synthetic` generates deterministic jobs from the root `seed`. It

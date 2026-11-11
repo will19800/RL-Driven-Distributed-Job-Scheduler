@@ -81,6 +81,26 @@ func TestLoadSmokeConfiguration(t *testing.T) {
 	}
 }
 
+func TestOutageValidation(t *testing.T) {
+	c, err := Decode(strings.NewReader(validYAML()))
+	if err != nil {
+		t.Fatal(err)
+	}
+	c.Outages = []OutageConfig{{NodeID: "node-1", FailAt: Duration{time.Second}, RecoverAt: Duration{2 * time.Second}}}
+	if err := c.Validate(); err != nil {
+		t.Fatal(err)
+	}
+	c.Outages = append(c.Outages, c.Outages[0])
+	if err := c.Validate(); !errors.Is(err, ErrInvalidConfig) {
+		t.Fatalf("overlap accepted: %v", err)
+	}
+	c.Outages = c.Outages[:1]
+	c.Outages[0].NodeID = "missing"
+	if err := c.Validate(); !errors.Is(err, ErrInvalidConfig) {
+		t.Fatalf("missing node accepted: %v", err)
+	}
+}
+
 func TestLoadSyntheticConfigurationDeterministically(t *testing.T) {
 	t.Parallel()
 	path := filepath.Join("..", "..", "configs", "experiments", "synthetic-smoke.yaml")

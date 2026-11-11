@@ -1,0 +1,108 @@
+{
+  "format": "training/v1",
+  "config": {
+    "policy": {
+      "max_jobs": 4,
+      "max_nodes": 2,
+      "normalization": {
+        "cpu_millis": 4000,
+        "memory_mib": 8192,
+        "gpus": 1,
+        "ephemeral_disk_mib": 1024,
+        "duration_seconds": 10,
+        "priority": 10,
+        "queue_length": 10,
+        "arrival_rate": 10,
+        "simulation_time_seconds": 100
+      }
+    },
+    "episode": {
+      "node_count": 2,
+      "node_capacity": {
+        "cpu_millis": 2000,
+        "memory_mib": 4096,
+        "gpus": 0,
+        "ephemeral_disk_mib": 1024
+      },
+      "job_count": 12,
+      "arrival_rate": 2,
+      "duration_min": 1,
+      "duration_max": 5,
+      "request": {
+        "cpu_millis": 1000,
+        "memory_mib": 1024,
+        "gpus": 0,
+        "ephemeral_disk_mib": 0
+      }
+    },
+    "reward": {
+      "throughput": 1,
+      "queue": 0.1,
+      "slowdown": 0.1,
+      "fragmentation": 0.01,
+      "sla": 1,
+      "invalid": 1,
+      "time_scale": 10,
+      "slowdown_clip": 100
+    },
+    "seed": 42,
+    "updates": 3,
+    "workers": 2,
+    "rollout_steps": 16,
+    "epochs": 2,
+    "learning_rate": 0.0003,
+    "gamma": 0.99,
+    "validation_seeds": [
+      1000001,
+      1000002
+    ],
+    "max_episode_steps": 100
+  },
+  "config_sha256": "d48bf5e1a44077e3cea0a63ef33b7e02c5aef3b85a5619e3b63c2c92ca16413a",
+  "torch": "2.15.0",
+  "python": "3.12.1",
+  "git_revision": "b39df0dad12fc16d09fa3335f589781bdd919304",
+  "git_modified": true,
+  "selection": "mean validation episode reward",
+  "history": [
+    {
+      "update": 1,
+      "loss": 35.923362731933594,
+      "validation_score": 10.440040494442647,
+      "reward_terms": {
+        "throughput": 24.0,
+        "queue": -3.8256258767877744,
+        "slowdown": -0.4177198658930794,
+        "fragmentation": -1.5546255166624583,
+        "sla": 0.0,
+        "invalid": 0.0
+      }
+    },
+    {
+      "update": 2,
+      "loss": 23.611003875732422,
+      "validation_score": 10.46651172939329,
+      "reward_terms": {
+        "throughput": 19.0,
+        "queue": -2.6348758494591946,
+        "slowdown": -0.23266124886465944,
+        "fragmentation": -1.4882498224051073,
+        "sla": 0.0,
+        "invalid": 0.0
+      }
+    },
+    {
+      "update": 3,
+      "loss": 24.94247055053711,
+      "validation_score": 10.462725709224687,
+      "reward_terms": {
+        "throughput": 20.0,
+        "queue": -2.8184177928620633,
+        "slowdown": -0.300673226360535,
+        "fragmentation": -1.538614455876665,
+        "sla": 0.0,
+        "invalid": 0.0
+      }
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+workload,baseline,policy,metric,metric_label,higher_is_better,pairs,baseline_mean,policy_mean,mean_difference,mean_improvement,ci95_low,ci95_high
+failure-200,bin-pack,first-fit,throughput_jobs_per_second,Throughput (jobs/s),True,20,9.857744204295605,9.857744204295605,0.0,0.0,0.0,0.0
+failure-200,bin-pack,first-fit,p99_latency_seconds,P99 latency (seconds),False,20,57.0,57.0,0.0,0.0,0.0,0.0
+failure-200,bin-pack,first-fit,mean_queue_depth,Mean queue depth,False,20,0.04945607215237671,0.04945607215237671,0.0,0.0,0.0,0.0
+failure-200,bin-pack,first-fit,cpu_utilization,CPU utilization,True,20,0.28362798625652835,0.28362798625652835,0.0,0.0,0.0,0.0
+failure-200,bin-pack,first-fit,slowdown_fairness_jain,Slowdown fairness (Jain),True,20,0.9999822816017969,0.9999822816017969,0.0,0.0,0.0,0.0
+failure-200,bin-pack,first-fit,deadline_violation_rate,Deadline violation rate,False,20,0.0,0.0,0.0,0.0,0.0,0.0
+failure-200,bin-pack,least-loaded,throughput_jobs_per_second,Throughput (jobs/s),True,20,9.857744204295605,9.75216979766831,-0.10557440662729514,-0.10557440662729514,-0.11548562618810584,-0.09551710950532948
+failure-200,bin-pack,least-loaded,p99_latency_seconds,P99 latency (seconds),False,20,57.0,58.5,1.5,-1.5,-4.5,0.0
+failure-200,bin-pack,least-loaded,mean_queue_depth,Mean queue depth,False,20,0.04945607215237671,0.03291730253276075,-0.016538769619615964,0.016538769619615964,0.004426388609580057,0.03188250559528193
+failure-200,bin-pack,least-loaded,cpu_utilization,CPU utilization,True,20,0.28362798625652835,0.28100386471928174,-0.0026241215372465763,-0.0026241215372465763,-0.003468879513958175,-0.001780421539201897
+failure-200,bin-pack,least-loaded,slowdown_fairness_jain,Slowdown fairness (Jain),True,20,0.9999822816017969,0.9999870905288134,4.80892701650304e-06,4.80892701650304e-06,1.4242821981924614e-06,8.956436829313517e-06
+failure-200,bin-pack,least-loaded,deadline_violation_rate,Deadline violation rate,False,20,0.0,0.0,0.0,0.0,0.0,0.0
+failure-200,bin-pack,random-fit,throughput_jobs_per_second,Throughput (jobs/s),True,20,9.857744204295605,9.785465727333854,-0.07227847696175083,-0.07227847696175083,-0.1131220788604048,-0.033040437116926766
+failure-200,bin-pack,random-fit,p99_latency_seconds,P99 latency (seconds),False,20,57.0,57.0,0.0,0.0,-4.5,4.5
+failure-200,bin-pack,random-fit,mean_queue_depth,Mean queue depth,False,20,0.04945607215237671,0.04782916189035687,-0.0016269102620198473,0.0016269102620198473,-0.029113732781012126,0.028745166882863594
+failure-200,bin-pack,random-fit,cpu_utilization,CPU utilization,True,20,0.28362798625652835,0.2823126466423526,-0.001315339614175709,-0.001315339614175709,-0.0026103023942500984,-1.2542943899240993e-05
+failure-200,bin-pack,random-fit,slowdown_fairness_jain,Slowdown fairness (Jain),True,20,0.9999822816017969,0.9999814619126688,-8.196891281009311e-07,-8.196891281009311e-07,-1.757611244843096e-05,1.4568435284232483e-05
+failure-200,bin-pack,random-fit,deadline_violation_rate,Deadline violation rate,False,20,0.0,0.0,0.0,0.0,0.0,0.0
+failure-200,bin-pack,rl,throughput_jobs_per_second,Throughput (jobs/s),True,20,9.857744204295605,9.856533040807156,-0.0012111634884494293,-0.0012111634884494293,-0.0031279296576579795,0.0
+failure-200,bin-pack,rl,p99_latency_seconds,P99 latency (seconds),False,20,57.0,57.0,0.0,0.0,0.0,0.0
+failure-200,bin-pack,rl,mean_queue_depth,Mean queue depth,False,20,0.04945607215237671,0.05368267959221488,0.004226607439838161,-0.004226607439838161,-0.0075958846370493965,-0.0003770242772224944
+failure-200,bin-pack,rl,cpu_utilization,CPU utilization,True,20,0.28362798625652835,0.28368181283113414,5.38265746057684e-05,5.38265746057684e-05,-0.00016264267899635188,0.00024589759873150114
+failure-200,bin-pack,rl,slowdown_fairness_jain,Slowdown fairness (Jain),True,20,0.9999822816017969,0.9999820096563903,-2.719454065658322e-07,-2.719454065658322e-07,-1.5415853433624338e-06,1.0760282254064493e-06
+failure-200,bin-pack,rl,deadline_violation_rate,Deadline violation rate,False,20,0.0,0.0,0.0,0.0,0.0,0.0
+failure-200,bin-pack,round-robin,throughput_jobs_per_second,Throughput (jobs/s),True,20,9.857744204295605,9.743903193877937,-0.11384101041766677,-0.11384101041766677,-0.12816317390418538,-0.10039171022255486
+failure-200,bin-pack,round-robin,p99_latency_seconds,P99 latency (seconds),False,20,57.0,58.5,1.5,-1.5,-4.5,0.0
+failure-200,bin-pack,round-robin,mean_queue_depth,Mean queue depth,False,20,0.04945607215237671,0.02972724836184239,-0.01972882379053432,0.01972882379053432,0.004829849289848949,0.03662359652188649
+failure-200,bin-pack,round-robin,cpu_utilization,CPU utilization,True,20,0.28362798625652835,0.2808112016171001,-0.0028167846394282366,-0.0028167846394282366,-0.0035784191602043014,-0.0020196507453042814
+failure-200,bin-pack,round-robin,slowdown_fairness_jain,Slowdown fairness (Jain),True,20,0.9999822816017969,0.99998993188269,7.65028089301234e-06,7.65028089301234e-06,1.5863937436300102e-06,1.5000056952863965e-05
+failure-200,bin-pack,round-robin,deadline_violation_rate,Deadline violation rate,False,20,0.0,0.0,0.0,0.0,0.0,0.0
+generalization-240,bin-pack,first-fit,throughput_jobs_per_second,Throughput (jobs/s),True,20,11.463457334221038,11.562545896420966,0.0990885621999272,0.0990885621999272,-0.018985361138665093,0.2555408930779766
+generalization-240,bin-pack,first-fit,p99_latency_seconds,P99 latency (seconds),False,20,57.0,52.5,-4.5,4.5,0.0,9.0
+generalization-240,bin-pack,first-fit,mean_queue_depth,Mean queue depth,False,20,9.39976592154762,1.9003279523495764,-7.499437969198044,7.499437969198044,6.4740405813204305,8.669324817611537
+generalization-240,bin-pack,first-fit,cpu_utilization,CPU utilization,True,20,0.24987820114109072,0.2520194336478219,0.0021412325067312,0.0021412325067312,-0.0004170733016563374,0.005466756419491459
+generalization-240,bin-pack,first-fit,slowdown_fairness_jain,Slowdown fairness (Jain),True,20,0.9836574234628463,0.9978109900453325,0.014153566582486116,0.014153566582486116,0.011901746721861327,0.01676336903628098
+generalization-240,bin-pack,first-fit,deadline_violation_rate,Deadline violation rate,False,20,0.0,0.0,0.0,0.0,0.0,0.0
+generalization-240,bin-pack,least-loaded,throughput_jobs_per_second,Throughput (jobs/s),True,20,11.463457334221038,11.546691077777457,0.08323374355641713,0.08323374355641713,-0.04094058870390305,0.24640942647031705
+generalization-240,bin-pack,least-loaded,p99_latency_seconds,P99 latency (seconds),False,20,57.0,52.5,-4.5,4.5,0.0,9.0
+generalization-240,bin-pack,least-loaded,mean_queue_depth,Mean queue depth,False,20,9.39976592154762,1.9887460181673386,-7.411019903380281,7.411019903380281,6.4259645177097235,8.534770804267387
+generalization-240,bin-pack,least-loaded,cpu_utilization,CPU utilization,True,20,0.24987820114109072,0.25168249939231946,0.0018042982512287628,0.0018042982512287628,-0.0008879543619573395,0.005212556199665492
+generalization-240,bin-pack,least-loaded,slowdown_fairness_jain,Slowdown fairness (Jain),True,20,0.9836574234628463,0.9976379233741042,0.013980499911257948,0.013980499911257948,0.011783502193617701,0.016574435250782577
+generalization-240,bin-pack,least-loaded,deadline_violation_rate,Deadline violation rate,False,20,0.0,0.0,0.0,0.0,0.0,0.0
+generalization-240,bin-pack,random-fit,throughput_jobs_per_second,Throughput (jobs/s),True,20,11.463457334221038,11.556919794697595,0.09346246047655749,0.09346246047655749,-0.015920848241168357,0.2359799851095563
+generalization-240,bin-pack,random-fit,p99_latency_seconds,P99 latency (seconds),False,20,57.0,54.0,-3.0,3.0,0.0,7.5
+generalization-240,bin-pack,random-fit,mean_queue_depth,Mean queue depth,False,20,9.39976592154762,3.333055074289401,-6.06671084725822,6.06671084725822,5.347477526854011,6.84600195895012
+generalization-240,bin-pack,random-fit,cpu_utilization,CPU utilization,True,20,0.24987820114109072,0.25190229277959225,0.0020240916385015476,0.0020240916385015476,-0.0003472821030686041,0.005064763024353634
+generalization-240,bin-pack,random-fit,slowdown_fairness_jain,Slowdown fairness (Jain),True,20,0.9836574234628463,0.995762326848024,0.012104903385177751,0.012104903385177751,0.010475548958718101,0.01404809980931359
+generalization-240,bin-pack,random-fit,deadline_violation_rate,Deadline violation rate,False,20,0.0,0.0,0.0,0.0,0.0,0.0
+generalization-240,bin-pack,rl,throughput_jobs_per_second,Throughput (jobs/s),True,20,11.463457334221038,10.834729604346675,-0.6287277298743623,-0.6287277298743623,-1.9061744148373465,0.017012125702106397
+generalization-240,bin-pack,rl,p99_latency_seconds,P99 latency (seconds),False,20,57.0,55.5,-1.5,1.5,0.0,4.5
+generalization-240,bin-pack,rl,mean_queue_depth,Mean queue depth,False,20,9.39976592154762,26.824565065033177,17.424799143485554,-17.424799143485554,-52.52114998675908,0.21376685520706123
+generalization-240,bin-pack,rl,cpu_utilization,CPU utilization,True,20,0.24987820114109072,0.2358598473273641,-0.014018353813726615,-0.014018353813726615,-0.04251840515292415,0.00039399500452716105
+generalization-240,bin-pack,rl,slowdown_fairness_jain,Slowdown fairness (Jain),True,20,0.9836574234628463,0.9844701705492197,0.000812747086373411,0.000812747086373411,-0.00017695257777860629,0.002329863773812699
+generalization-240,bin-pack,rl,deadline_violation_rate,Deadline violation rate,False,20,0.0,0.0,0.0,0.0,0.0,0.0
+generalization-240,bin-pack,round-robin,throughput_jobs_per_second,Throughput (jobs/s),True,20,11.463457334221038,11.512299509822672,0.04884217560163231,0.04884217560163231,-0.017971598926386285,0.12761182095204016
+generalization-240,bin-pack,round-robin,p99_latency_seconds,P99 latency (seconds),False,20,57.0,54.0,-3.0,3.0,0.0,7.5
+generalization-240,bin-pack,round-robin,mean_queue_depth,Mean queue depth,False,20,9.39976592154762,4.609166947239168,-4.790598974308453,4.790598974308453,4.255411671540682,5.337767150886493
+generalization-240,bin-pack,round-robin,cpu_utilization,CPU utilization,True,20,0.24987820114109072,0.2509516984016611,0.0010734972605703885,0.0010734972605703885,-0.0003104886263288083,0.002806804435190702
+generalization-240,bin-pack,round-robin,slowdown_fairness_jain,Slowdown fairness (Jain),True,20,0.9836574234628463,0.9936751774672,0.010017754004353696,0.010017754004353696,0.008914214290558916,0.011263780529820416
+generalization-240,bin-pack,round-robin,deadline_violation_rate,Deadline violation rate,False,20,0.0,0.0,0.0,0.0,0.0,0.0
+steady-200,bin-pack,first-fit,throughput_jobs_per_second,Throughput (jobs/s),True,20,10.427444118143402,10.427444118143402,0.0,0.0,0.0,0.0
+steady-200,bin-pack,first-fit,p99_latency_seconds,P99 latency (seconds),False,20,52.5,52.5,0.0,0.0,0.0,0.0
+steady-200,bin-pack,first-fit,mean_queue_depth,Mean queue depth,False,20,0.0,0.0,0.0,0.0,0.0,0.0
+steady-200,bin-pack,first-fit,cpu_utilization,CPU utilization,True,20,0.2962323356860204,0.2962323356860204,0.0,0.0,0.0,0.0
+steady-200,bin-pack,first-fit,slowdown_fairness_jain,Slowdown fairness (Jain),True,20,1.0,1.0,0.0,0.0,0.0,0.0
+steady-200,bin-pack,first-fit,deadline_violation_rate,Deadline violation rate,False,20,0.0,0.0,0.0,0.0,0.0,0.0
+steady-200,bin-pack,least-loaded,throughput_jobs_per_second,Throughput (jobs/s),True,20,10.427444118143402,10.427444118143402,0.0,0.0,0.0,0.0
+steady-200,bin-pack,least-loaded,p99_latency_seconds,P99 latency (seconds),False,20,52.5,52.5,0.0,0.0,0.0,0.0
+steady-200,bin-pack,least-loaded,mean_queue_depth,Mean queue depth,False,20,0.0,0.0,0.0,0.0,0.0,0.0
+steady-200,bin-pack,least-loaded,cpu_utilization,CPU utilization,True,20,0.2962323356860204,0.2962323356860204,0.0,0.0,0.0,0.0
+steady-200,bin-pack,least-loaded,slowdown_fairness_jain,Slowdown fairness (Jain),True,20,1.0,1.0,0.0,0.0,0.0,0.0
+steady-200,bin-pack,least-loaded,deadline_violation_rate,Deadline violation rate,False,20,0.0,0.0,0.0,0.0,0.0,0.0
+steady-200,bin-pack,random-fit,throughput_jobs_per_second,Throughput (jobs/s),True,20,10.427444118143402,10.427444118143402,0.0,0.0,0.0,0.0
+steady-200,bin-pack,random-fit,p99_latency_seconds,P99 latency (seconds),False,20,52.5,52.5,0.0,0.0,0.0,0.0
+steady-200,bin-pack,random-fit,mean_queue_depth,Mean queue depth,False,20,0.0,0.0,0.0,0.0,0.0,0.0
+steady-200,bin-pack,random-fit,cpu_utilization,CPU utilization,True,20,0.2962323356860204,0.2962323356860204,0.0,0.0,0.0,0.0
+steady-200,bin-pack,random-fit,slowdown_fairness_jain,Slowdown fairness (Jain),True,20,1.0,1.0,0.0,0.0,0.0,0.0
+steady-200,bin-pack,random-fit,deadline_violation_rate,Deadline violation rate,False,20,0.0,0.0,0.0,0.0,0.0,0.0
+steady-200,bin-pack,rl,throughput_jobs_per_second,Throughput (jobs/s),True,20,10.427444118143402,10.427444118143402,0.0,0.0,0.0,0.0
+steady-200,bin-pack,rl,p99_latency_seconds,P99 latency (seconds),False,20,52.5,52.5,0.0,0.0,0.0,0.0
+steady-200,bin-pack,rl,mean_queue_depth,Mean queue depth,False,20,0.0,0.00603362196178322,0.00603362196178322,-0.00603362196178322,-0.007208982030156522,-0.004953829644900994
+steady-200,bin-pack,rl,cpu_utilization,CPU utilization,True,20,0.2962323356860204,0.2962323356860204,2.7755575615628915e-18,2.7755575615628915e-18,-1.9428902930940238e-17,2.7755575615628914e-17
+steady-200,bin-pack,rl,slowdown_fairness_jain,Slowdown fairness (Jain),True,20,1.0,0.9999993154990131,-6.845009868694518e-07,-6.845009868694518e-07,-8.988264089654362e-07,-4.93158002034394e-07
+steady-200,bin-pack,rl,deadline_violation_rate,Deadline violation rate,False,20,0.0,0.0,0.0,0.0,0.0,0.0
+steady-200,bin-pack,round-robin,throughput_jobs_per_second,Throughput (jobs/s),True,20,10.427444118143402,10.427444118143402,0.0,0.0,0.0,0.0
+steady-200,bin-pack,round-robin,p99_latency_seconds,P99 latency (seconds),False,20,52.5,52.5,0.0,0.0,0.0,0.0
+steady-200,bin-pack,round-robin,mean_queue_depth,Mean queue depth,False,20,0.0,0.0,0.0,0.0,0.0,0.0
+steady-200,bin-pack,round-robin,cpu_utilization,CPU utilization,True,20,0.2962323356860204,0.2962323356860204,0.0,0.0,0.0,0.0
+steady-200,bin-pack,round-robin,slowdown_fairness_jain,Slowdown fairness (Jain),True,20,1.0,1.0,0.0,0.0,0.0,0.0
+steady-200,bin-pack,round-robin,deadline_violation_rate,Deadline violation rate,False,20,0.0,0.0,0.0,0.0,0.0,0.0

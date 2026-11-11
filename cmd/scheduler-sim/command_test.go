@@ -19,6 +19,40 @@ import (
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/simulator"
 )
 
+func TestOutOfOrderAdjacentOutagesRunChronologically(t *testing.T) {
+	input := `schema_version: v1
+seed: 1
+cluster:
+  nodes:
+    - id: node
+      capacity: {cpu_millis: 1000}
+workload:
+  jobs:
+    - id: job
+      submit_time: 0s
+      resources: {cpu_millis: 1000}
+      duration: 10s
+outages:
+  - {node_id: node, fail_at: 3s, recover_at: 4s}
+  - {node_id: node, fail_at: 1s, recover_at: 3s}
+`
+	path := filepath.Join(t.TempDir(), "outages.yaml")
+	if err := os.WriteFile(path, []byte(input), 0600); err != nil {
+		t.Fatal(err)
+	}
+	var stdout, stderr bytes.Buffer
+	if code := runCLI(context.Background(), []string{"run", "--config", path}, &stdout, &stderr); code != 0 {
+		t.Fatalf("exit %d: %s", code, stderr.String())
+	}
+	var summary resultSummary
+	if err := json.Unmarshal(stdout.Bytes(), &summary); err != nil {
+		t.Fatal(err)
+	}
+	if summary.Jobs.Rejected != 1 {
+		t.Fatalf("jobs %+v", summary.Jobs)
+	}
+}
+
 func smokeConfigPath() string {
 	return filepath.Join("..", "..", "configs", "experiments", "smoke.yaml")
 }

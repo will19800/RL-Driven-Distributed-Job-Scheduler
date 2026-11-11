@@ -1,0 +1,1833 @@
+{
+  "cluster": {
+    "nodes": [
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0000"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0001"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0002"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0003"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0004"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0005"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0006"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0007"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0008"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0009"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0010"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0011"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0012"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0013"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0014"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0015"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0016"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0017"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0018"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0019"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0020"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0021"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0022"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0023"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0024"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0025"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0026"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0027"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0028"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0029"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0030"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0031"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0032"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0033"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0034"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0035"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0036"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0037"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0038"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0039"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0040"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0041"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0042"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0043"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0044"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0045"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0046"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0047"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0048"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0049"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0050"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0051"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0052"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0053"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0054"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0055"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0056"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0057"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0058"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0059"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0060"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0061"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0062"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0063"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0064"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0065"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0066"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0067"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0068"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0069"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0070"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0071"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0072"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0073"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0074"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0075"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0076"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0077"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0078"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0079"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0080"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0081"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0082"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0083"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0084"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0085"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0086"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0087"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0088"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0089"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0090"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0091"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0092"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0093"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0094"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0095"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0096"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0097"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0098"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0099"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0100"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0101"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0102"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0103"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0104"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0105"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0106"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0107"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0108"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0109"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0110"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0111"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0112"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0113"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0114"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0115"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0116"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0117"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0118"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0119"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0120"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0121"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0122"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0123"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0124"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0125"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0126"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0127"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0128"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0129"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0130"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0131"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0132"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0133"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0134"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0135"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0136"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0137"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0138"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0139"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0140"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0141"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0142"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0143"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0144"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0145"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0146"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0147"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0148"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0149"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0150"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0151"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0152"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0153"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0154"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0155"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0156"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0157"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0158"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0159"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0160"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0161"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0162"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0163"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0164"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0165"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0166"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0167"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0168"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0169"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0170"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0171"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0172"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0173"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0174"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0175"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0176"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0177"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0178"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0179"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0180"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0181"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0182"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0183"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0184"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0185"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0186"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0187"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0188"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0189"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0190"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0191"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0192"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0193"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0194"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0195"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0196"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0197"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0198"
+      },
+      {
+        "capacity": {
+          "cpu_millis": 4000,
+          "ephemeral_disk_mib": 16384,
+          "gpus": 0,
+          "memory_mib": 8192
+        },
+        "id": "node-0199"
+      }
+    ]
+  },
+  "schema_version": "v1",
+  "seed": 2001,
+  "workload": {
+    "synthetic": {
+      "arrival_rate_per_second": 30,
+      "count": 600,
+      "duration": {
+        "max": "1m",
+        "median": "10s",
+        "min": "1s",
+        "sigma": 0.5
+      },
+      "profiles": [
+        {
+          "name": "balanced",
+          "resources": {
+            "cpu_millis": 2000,
+            "ephemeral_disk_mib": 64,
+            "gpus": 0,
+            "memory_mib": 2048
+          },
+          "weight": 1
+        }
+      ],
+      "start_time": "0s"
+    }
+  }
+}

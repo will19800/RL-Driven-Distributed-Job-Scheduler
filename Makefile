@@ -3,6 +3,7 @@ SHELL := /bin/sh
 GO ?= go
 PYTHON ?= python3
 GOFMT ?= gofmt
+BENCHMARK_OUTPUT ?= results/release-reproduction
 
 PROJECT_ROOT := $(CURDIR)
 BUILD_DIR := $(PROJECT_ROOT)/bin
@@ -17,7 +18,7 @@ export PYTHONPATH
 .DEFAULT_GOAL := help
 
 .PHONY: help fmt fmt-check docs-check lint test test-go test-python build \
-	train-smoke ppo-smoke environment-smoke benchmark-smoke analysis-smoke clean
+	train-smoke ppo-smoke environment-smoke benchmark-smoke benchmark-release analysis-smoke clean
 
 help: ## Show available development commands.
 	@awk 'BEGIN {FS = ":.*## "} /^[a-zA-Z0-9_-]+:.*## / {printf "  %-18s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -68,6 +69,9 @@ environment-smoke: ## Run deterministic training-environment tests.
 
 benchmark-smoke: ## Run the deterministic smoke simulation.
 	$(GO) run ./cmd/scheduler-sim run --config configs/experiments/smoke.yaml
+
+benchmark-release: build ## Reproduce 360 scale runs and a paired report (training extra required).
+	$(PYTHON) scripts/benchmark_release.py --python "$(PYTHON)" --output "$(BENCHMARK_OUTPUT)"
 
 analysis-smoke: ## Run the deterministic analysis golden tests.
 	$(PYTHON) -m unittest python.tests.test_analysis -v

@@ -10,6 +10,61 @@ import (
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/domain"
 )
 
+func TestFailureRejectsRunningJobsAndRecoveryAllowsNewWork(t *testing.T) {
+	nodes := []domain.Node{{ID: "node", Capacity: domain.ResourceVector{CPUMillis: 1000}, State: domain.NodeStateAvailable}}
+	jobs := []domain.Job{
+		{ID: "failed", Request: domain.ResourceVector{CPUMillis: 1000}, Duration: 5 * time.Second, State: domain.JobStateQueued},
+		{ID: "later", SubmitTime: 2 * time.Second, Request: domain.ResourceVector{CPUMillis: 1000}, Duration: time.Second, State: domain.JobStateQueued},
+	}
+	simulation, err := NewSimulation(nodes, jobs)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := simulation.ScheduleAvailability(time.Second, "node", false); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := simulation.ScheduleAvailability(3*time.Second, "node", true); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := simulation.SchedulePlacement(0, domain.Placement{JobID: "failed", NodeID: "node"}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := simulation.SchedulePlacement(3*time.Second, domain.Placement{JobID: "later", NodeID: "node"}); err != nil {
+		t.Fatal(err)
+	}
+	for {
+		event, ok, err := simulation.RunNext(context.Background())
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !ok {
+			break
+		}
+		if err := simulation.Validate(); err != nil {
+			t.Fatal(err)
+		}
+		if event.Type == EventNodeFailed {
+			node, _ := simulation.Node("node")
+			if !node.Allocated.IsZero() || node.State != domain.NodeStateUnavailable {
+				t.Fatalf("failed node %+v", node)
+			}
+			job, _ := simulation.Job("failed")
+			if job.State != domain.JobStateRejected || job.RejectionReason != "node_failed" || *job.EndTime != time.Second {
+				t.Fatalf("failed job %+v", job)
+			}
+		}
+	}
+	failed, _ := simulation.Job("failed")
+	later, _ := simulation.Job("later")
+	if failed.State != domain.JobStateRejected || later.State != domain.JobStateCompleted {
+		t.Fatalf("final jobs %+v %+v", failed, later)
+	}
+	node, _ := simulation.Node("node")
+	if !node.Allocated.IsZero() || node.State != domain.NodeStateAvailable {
+		t.Fatalf("final node %+v", node)
+	}
+}
+
 func simulationNode() domain.Node {
 	return domain.Node{
 		ID:       "node-1",
