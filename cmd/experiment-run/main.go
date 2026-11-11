@@ -7,12 +7,17 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/signal"
 	"path/filepath"
 
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/experiment"
 )
 
-func main() { os.Exit(runCLI(context.Background(), os.Args[1:], os.Stdout, os.Stderr)) }
+func main() {
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer stop()
+	os.Exit(runCLI(ctx, os.Args[1:], os.Stdout, os.Stderr))
+}
 
 func runCLI(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 	flags := flag.NewFlagSet("experiment-run", flag.ContinueOnError)
@@ -36,7 +41,7 @@ func runCLI(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 		}
 		binary = filepath.Join(filepath.Dir(executable), "scheduler-sim")
 	}
-	matrix, err := experiment.Run(ctx, spec, experiment.CommandRunner{Binary: binary})
+	matrix, err := experiment.Run(ctx, spec, experiment.CommandRunner{Binary: binary, Inference: spec.Inference})
 	if err != nil {
 		writeError(stderr, err)
 		return 1

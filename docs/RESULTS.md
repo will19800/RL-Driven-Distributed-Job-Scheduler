@@ -32,3 +32,9 @@ go run ./cmd/result-check path/to/bundle
 Detailed rows are opt-in because retaining event-aligned time-series records in
 memory is inappropriate for unrestricted large runs. Aggregate metrics remain
 streaming and bounded when `--results-dir` is omitted.
+
+RL runs additionally include `summary.inference` (decisions, model calls,
+fallbacks, and reason counts). Their manifests include `model` metadata,
+`inference_timeout`, and `fallback_policy`. These optional v1 fields are absent
+for baseline runs. The current validator checks model metadata and diagnostic
+counter consistency as well as the existing bundle hashes and output schemas.

@@ -4,6 +4,7 @@ package results
 import (
 	"time"
 
+	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/inference"
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/metrics"
 )
 
@@ -12,13 +13,14 @@ const SchemaVersion = "v1"
 
 // Summary is the aggregate result schema.
 type Summary struct {
-	SchemaVersion  string        `json:"schema_version"`
-	Policy         string        `json:"policy"`
-	Seed           int64         `json:"seed"`
-	SimulationTime string        `json:"simulation_time"`
-	NodeCount      int           `json:"node_count"`
-	Jobs           JobSummary    `json:"jobs"`
-	Metrics        MetricSummary `json:"metrics"`
+	Inference      *inference.Diagnostics `json:"inference,omitempty"`
+	SchemaVersion  string                 `json:"schema_version"`
+	Policy         string                 `json:"policy"`
+	Seed           int64                  `json:"seed"`
+	SimulationTime string                 `json:"simulation_time"`
+	NodeCount      int                    `json:"node_count"`
+	Jobs           JobSummary             `json:"jobs"`
+	Metrics        MetricSummary          `json:"metrics"`
 }
 
 type JobSummary struct {
@@ -70,18 +72,21 @@ type SchedulerMetrics struct {
 
 // Manifest records run identity, inputs, provenance, and output hashes.
 type Manifest struct {
-	SchemaVersion  string            `json:"schema_version"`
-	RunID          string            `json:"run_id"`
-	StartedAt      time.Time         `json:"started_at"`
-	FinishedAt     time.Time         `json:"finished_at"`
-	Policy         string            `json:"policy"`
-	Seed           int64             `json:"seed"`
-	CommandVersion string            `json:"command_version"`
-	Configuration  InputArtifact     `json:"configuration"`
-	Git            GitProvenance     `json:"git"`
-	Runtime        RuntimeProvenance `json:"runtime"`
-	Dependencies   []Dependency      `json:"dependencies"`
-	Outputs        []OutputArtifact  `json:"outputs"`
+	Model            *inference.Metadata `json:"model,omitempty"`
+	InferenceTimeout string              `json:"inference_timeout,omitempty"`
+	FallbackPolicy   string              `json:"fallback_policy,omitempty"`
+	SchemaVersion    string              `json:"schema_version"`
+	RunID            string              `json:"run_id"`
+	StartedAt        time.Time           `json:"started_at"`
+	FinishedAt       time.Time           `json:"finished_at"`
+	Policy           string              `json:"policy"`
+	Seed             int64               `json:"seed"`
+	CommandVersion   string              `json:"command_version"`
+	Configuration    InputArtifact       `json:"configuration"`
+	Git              GitProvenance       `json:"git"`
+	Runtime          RuntimeProvenance   `json:"runtime"`
+	Dependencies     []Dependency        `json:"dependencies"`
+	Outputs          []OutputArtifact    `json:"outputs"`
 }
 
 type InputArtifact struct {

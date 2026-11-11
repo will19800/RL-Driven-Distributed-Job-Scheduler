@@ -1,0 +1,13 @@
+schema_version: v1
+output_dir: ../../results/rl-paired-smoke
+workers: 2
+seeds: [41, 42]
+policies: [first-fit, bin-pack, rl]
+inference:
+  model: ../../results/policy-smoke
+  python: ../../.venv/bin/python
+  timeout: 250ms
+  fallback: bin-pack
+workloads:
+  - name: steady
+    config: ../experiments/synthetic-smoke.yaml

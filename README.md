@@ -23,6 +23,8 @@ The [seeded training environment](docs/TRAINING_ENVIRONMENT.md) defines the
 event, reset, step, termination, and reproducibility semantics used by RL code.
 The [training guide](docs/TRAINING.md) covers decomposed rewards, batched PPO,
 checkpoint/resume, validation selection, and versioned TorchScript export.
+The [inference guide](docs/INFERENCE.md) covers Go model execution, timeouts,
+validated fallback, and runtime diagnostics.
 
 ## Prerequisites
 
@@ -42,7 +44,8 @@ not yet require third-party dependencies.
 | M2 — Baseline scheduler suite | Complete |
 | M3 — Experiment and measurement platform | In progress (aggregate metrics available) |
 | M4 — RL environment, training, and export | Smoke pipeline implemented |
-| M5–M7 — Go inference, evidence, and release | Planned |
+| M5 — Go inference and safety | Implemented with process bridge |
+| M6–M7 — Scale evidence and release | Planned |
 
 ## Run the smoke simulation
 

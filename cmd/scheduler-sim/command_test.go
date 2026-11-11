@@ -10,7 +10,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/config"
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/domain"
+	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/inference"
+	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/metrics"
+	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/policyv1"
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/results"
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/simulator"
 )
@@ -168,6 +172,8 @@ func TestRunCLIReturnsStructuredErrors(t *testing.T) {
 		{"missing command", nil, 2, "usage"},
 		{"missing config flag", []string{"run"}, 2, "usage"},
 		{"unknown policy", []string{"run", "--config", smokeConfigPath(), "--policy", "unknown"}, 2, "usage"},
+		{"missing model", []string{"run", "--config", smokeConfigPath(), "--policy", "rl"}, 2, "usage"},
+		{"model with baseline", []string{"run", "--config", smokeConfigPath(), "--model", "unused"}, 2, "usage"},
 		{"invalid seed", []string{"run", "--config", smokeConfigPath(), "--seed", "nope"}, 2, "usage"},
 		{"missing config file", []string{"run", "--config", filepath.Join(t.TempDir(), "missing.yaml")}, 1, "config_load_failed"},
 		{"bad output path", []string{"run", "--config", smokeConfigPath(), "--output", filepath.Join(t.TempDir(), "missing", "summary.json")}, 1, "result_write_failed"},
@@ -185,6 +191,72 @@ func TestRunCLIReturnsStructuredErrors(t *testing.T) {
 			}
 			if envelope.Error == nil || envelope.Error.Code != test.want {
 				t.Fatalf("error = %+v, want code %q", envelope.Error, test.want)
+			}
+		})
+	}
+}
+
+type brokenRuntime struct{}
+
+func (brokenRuntime) Predict(context.Context, policyv1.Observation) ([]float64, error) {
+	return nil, errors.New("injected runtime failure")
+}
+
+func TestRLFallbackCompletesSimulationWithoutInvariantFailures(t *testing.T) {
+	configuration, err := config.Load(smokeConfigPath())
+	if err != nil {
+		t.Fatal(err)
+	}
+	nodes, jobs, err := configuration.DomainValues()
+	if err != nil {
+		t.Fatal(err)
+	}
+	simulation, err := simulator.NewSimulation(nodes, jobs)
+	if err != nil {
+		t.Fatal(err)
+	}
+	policy, err := inference.NewPolicy(policyv1.DefaultConfig(), brokenRuntime{}, firstFitPolicy{}, time.Second)
+	if err != nil {
+		t.Fatal(err)
+	}
+	report, err := runSimulation(context.Background(), simulation, policy, metrics.NewCollector(), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if report.Completed != 3 || report.Decisions.InvalidDecisions != 0 || policy.Diagnostics().Fallbacks != 3 {
+		t.Fatalf("report %+v, diagnostics %+v", report, policy.Diagnostics())
+	}
+	if err := simulation.Validate(); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestRLCLIWithRealModel(t *testing.T) {
+	model := os.Getenv("SCHEDULER_TEST_MODEL")
+	python := os.Getenv("SCHEDULER_TEST_PYTHON")
+	if model == "" || python == "" {
+		t.Skip("set real model and interpreter paths")
+	}
+	for _, budget := range []string{"1s", "1ns"} {
+		t.Run(budget, func(t *testing.T) {
+			directory := filepath.Join(t.TempDir(), "bundle")
+			var stdout, stderr bytes.Buffer
+			code := runCLI(context.Background(), []string{"run", "--config", smokeConfigPath(), "--policy", "rl", "--model", model, "--python", python, "--inference-timeout", budget, "--results-dir", directory}, &stdout, &stderr)
+			if code != 0 {
+				t.Fatalf("exit %d: %s", code, stderr.String())
+			}
+			if err := results.ValidateBundle(directory); err != nil {
+				t.Fatal(err)
+			}
+			var summary resultSummary
+			if err := json.Unmarshal(stdout.Bytes(), &summary); err != nil {
+				t.Fatal(err)
+			}
+			if summary.Inference == nil {
+				t.Fatal("missing inference diagnostics")
+			}
+			if budget == "1ns" && summary.Inference.Fallbacks == 0 {
+				t.Fatal("deadline did not trigger fallback")
 			}
 		})
 	}

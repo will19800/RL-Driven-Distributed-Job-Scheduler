@@ -7,6 +7,9 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/inference"
+	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/policyv1"
 )
 
 func validSummary() Summary {
@@ -19,6 +22,33 @@ func validSummary() Summary {
 			MeanBoundedSlowdown: 1, SlowdownFairness: 1,
 			Scheduler: SchedulerMetrics{TotalDuration: "0s", MeanDuration: "0s", MaxDuration: "0s"},
 		},
+	}
+}
+
+func TestRLBundleProvenanceAndDiagnosticValidation(t *testing.T) {
+	manifest, summary, jobs, series := validBundleInputs()
+	manifest.Policy = "rl"
+	summary.Policy = "rl"
+	contract, _ := policyv1.DefaultConfig().Schema()
+	hash := strings.Repeat("a", 64)
+	manifest.Model = &inference.Metadata{Format: "inference/v1", Runtime: "torchscript", Schema: contract, Torch: "test", ModelSHA256: hash, CheckpointSHA256: hash, ParitySHA256: hash}
+	manifest.InferenceTimeout = "250ms"
+	manifest.FallbackPolicy = "bin-pack"
+	summary.Inference = &inference.Diagnostics{Decisions: 2, ModelCalls: 1, Fallbacks: 1, Reasons: map[string]uint64{"runtime": 1}}
+	directory := filepath.Join(t.TempDir(), "rl")
+	if err := WriteBundle(directory, manifest, summary, jobs, series); err != nil {
+		t.Fatal(err)
+	}
+	if err := ValidateBundle(directory); err != nil {
+		t.Fatal(err)
+	}
+	summary.Inference.Reasons["runtime"] = 2
+	if err := validateSummary(summary); !errors.Is(err, ErrInvalidBundle) {
+		t.Fatalf("counter mismatch accepted: %v", err)
+	}
+	manifest.Model.Format = "bad"
+	if err := validateManifest(manifest); !errors.Is(err, ErrInvalidBundle) {
+		t.Fatalf("invalid model provenance accepted: %v", err)
 	}
 }
 

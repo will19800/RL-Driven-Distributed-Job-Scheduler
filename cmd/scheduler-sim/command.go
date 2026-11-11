@@ -14,6 +14,7 @@ import (
 
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/config"
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/domain"
+	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/inference"
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/metrics"
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/policies"
 	"github.com/will19800/RL-Driven-Distributed-Job-Scheduler/internal/results"
@@ -25,7 +26,8 @@ const usage = `Usage:
   scheduler-sim run --config PATH [--output PATH] [--results-dir DIR] [--policy POLICY] [--seed SEED]
   scheduler-sim --version
 
-Policies: first-fit, round-robin, random-fit, least-loaded, bin-pack
+Policies: first-fit, round-robin, random-fit, least-loaded, bin-pack, rl
+RL: --model DIR --python PATH [--inference-timeout 250ms] [--fallback bin-pack]
 `
 
 type commandError struct {
@@ -72,6 +74,10 @@ func runCommand(ctx context.Context, args []string, stdout io.Writer) *commandEr
 	outputPath := flags.String("output", "-", "summary output path, or - for stdout")
 	resultsDir := flags.String("results-dir", "", "write a versioned detailed result bundle")
 	policy := flags.String("policy", "first-fit", "scheduling policy")
+	modelDir := flags.String("model", "", "versioned exported model directory")
+	python := flags.String("python", "python3", "Python interpreter with training extra installed")
+	inferenceTimeout := flags.Duration("inference-timeout", 250*time.Millisecond, "per-decision inference budget")
+	fallbackName := flags.String("fallback", "bin-pack", "fallback baseline policy")
 	seedOverride := ""
 	flags.StringVar(&seedOverride, "seed", "", "override the configuration seed")
 	if err := flags.Parse(args); err != nil {
@@ -107,9 +113,37 @@ func runCommand(ctx context.Context, args []string, stdout io.Writer) *commandEr
 	if err != nil {
 		return newCommandError("simulation_init_failed", err)
 	}
-	selectedPolicy, err := newPolicy(*policy, configuration.Seed)
-	if err != nil {
-		return newCommandError("usage", err)
+	var selectedPolicy scheduler.Policy
+	var rlPolicy *inference.Policy
+	var process *inference.Process
+	if *policy == "rl" {
+		if *modelDir == "" || *inferenceTimeout <= 0 {
+			return newCommandError("usage", errors.New("rl requires --model and a positive --inference-timeout"))
+		}
+		fallback, fallbackErr := newPolicy(*fallbackName, configuration.Seed)
+		if fallbackErr != nil {
+			return newCommandError("usage", fallbackErr)
+		}
+		startup, cancel := context.WithTimeout(ctx, inference.StartupTimeout)
+		process, err = inference.Start(startup, *python, *modelDir)
+		cancel()
+		if err != nil {
+			return newCommandError("model_load_failed", err)
+		}
+		defer process.Close()
+		rlPolicy, err = inference.NewPolicy(process.Config, process, fallback, *inferenceTimeout)
+		if err != nil {
+			return newCommandError("model_load_failed", err)
+		}
+		selectedPolicy = rlPolicy
+	} else {
+		if *modelDir != "" {
+			return newCommandError("usage", errors.New("--model requires --policy rl"))
+		}
+		selectedPolicy, err = newPolicy(*policy, configuration.Seed)
+		if err != nil {
+			return newCommandError("usage", err)
+		}
 	}
 	var recorder *detailRecorder
 	if *resultsDir != "" {
@@ -120,6 +154,10 @@ func runCommand(ctx context.Context, args []string, stdout io.Writer) *commandEr
 		return newCommandError("simulation_failed", err)
 	}
 	summary := buildSummary(selectedPolicy.Name(), configuration.Seed, simulation, report)
+	if rlPolicy != nil {
+		diagnostics := rlPolicy.Diagnostics()
+		summary.Inference = &diagnostics
+	}
 	encoded, err := json.MarshalIndent(summary, "", "  ")
 	if err != nil {
 		return newCommandError("result_encode_failed", err)
@@ -127,6 +165,11 @@ func runCommand(ctx context.Context, args []string, stdout io.Writer) *commandEr
 	encoded = append(encoded, '\n')
 	if *resultsDir != "" {
 		manifest := results.NewManifest(*configPath, configData, selectedPolicy.Name(), configuration.Seed, version, startedAt, time.Now())
+		if process != nil {
+			manifest.Model = &process.Metadata
+			manifest.InferenceTimeout = inferenceTimeout.String()
+			manifest.FallbackPolicy = *fallbackName
+		}
 		if err := results.WriteBundle(*resultsDir, manifest, summary, buildJobRecords(simulation.Jobs()), recorder.series); err != nil {
 			return newCommandError("result_write_failed", err)
 		}

@@ -56,6 +56,27 @@ On failure, the command cancels outstanding work and returns a nonzero status.
 Completed bundles remain for diagnosis, but the absent `matrix.json` makes the
 incomplete experiment unambiguous. Choose a new output directory to rerun.
 
+## Including an exported RL policy
+
+Add `rl` to `policies` and declare a root-level `inference` mapping:
+
+```yaml
+inference:
+  model: ../../results/policy-smoke
+  python: ../../.venv/bin/python
+  timeout: 250ms
+  fallback: bin-pack
+```
+
+Model and interpreter paths containing directory separators resolve relative
+to the matrix configuration. A bare interpreter name resolves via `PATH`.
+The defaults are `python3`, `250ms`, and `bin-pack`; `model` is required.
+Run with `PYTHONPATH=python` when using an uninstalled repository checkout.
+Every RL cell owns its worker and records model provenance and fallback counts
+in its bundle. Startup parity checks must pass before a cell can run.
+The checked-in [`rl-smoke.yaml`](../configs/matrices/rl-smoke.yaml) compares
+first-fit, bin-pack, and RL on two paired seeds after the training-guide export.
+
 ## Statistical comparison report
 
 Analyze a completed matrix against a baseline policy with:

@@ -196,6 +196,14 @@ func ValidateBundle(directory string) error {
 }
 
 func validateManifest(manifest Manifest) error {
+	if manifest.Policy == "rl" {
+		if manifest.Model == nil || manifest.Model.Validate() != nil || manifest.FallbackPolicy == "" {
+			return fmt.Errorf("%w: missing or invalid model provenance", ErrInvalidBundle)
+		}
+		if budget, err := time.ParseDuration(manifest.InferenceTimeout); err != nil || budget <= 0 {
+			return fmt.Errorf("%w: invalid inference timeout", ErrInvalidBundle)
+		}
+	}
 	if manifest.SchemaVersion != SchemaVersion || !validRunID(manifest.RunID) || manifest.Policy == "" || manifest.CommandVersion == "" || manifest.Configuration.Path == "" {
 		return fmt.Errorf("%w: manifest required fields or version", ErrInvalidBundle)
 	}
@@ -218,6 +226,24 @@ func validateManifest(manifest Manifest) error {
 }
 
 func validateSummary(summary Summary) error {
+	if summary.Policy == "rl" && summary.Inference == nil {
+		return fmt.Errorf("%w: missing inference diagnostics", ErrInvalidBundle)
+	}
+	if diagnostics := summary.Inference; diagnostics != nil {
+		if diagnostics.Fallbacks > diagnostics.Decisions || diagnostics.ModelCalls > diagnostics.Decisions {
+			return fmt.Errorf("%w: invalid inference counters", ErrInvalidBundle)
+		}
+		var total uint64
+		for _, count := range diagnostics.Reasons {
+			if count > diagnostics.Fallbacks-total {
+				return fmt.Errorf("%w: invalid fallback reason counts", ErrInvalidBundle)
+			}
+			total += count
+		}
+		if total != diagnostics.Fallbacks {
+			return fmt.Errorf("%w: fallback reasons do not total", ErrInvalidBundle)
+		}
+	}
 	if summary.SchemaVersion != SchemaVersion || summary.Policy == "" || summary.NodeCount < 0 ||
 		summary.Jobs.Total < 0 || summary.Jobs.Queued < 0 || summary.Jobs.Running < 0 || summary.Jobs.Completed < 0 || summary.Jobs.Rejected < 0 {
 		return fmt.Errorf("%w: summary required fields or version", ErrInvalidBundle)

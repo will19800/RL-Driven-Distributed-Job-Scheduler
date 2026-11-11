@@ -15,6 +15,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"gopkg.in/yaml.v3"
 )
@@ -31,12 +32,20 @@ var (
 )
 
 type Spec struct {
-	SchemaVersion string     `yaml:"schema_version"`
-	OutputDir     string     `yaml:"output_dir"`
-	Workers       int        `yaml:"workers"`
-	Seeds         []int64    `yaml:"seeds"`
-	Policies      []string   `yaml:"policies"`
-	Workloads     []Workload `yaml:"workloads"`
+	Inference     *InferenceConfig `yaml:"inference,omitempty"`
+	SchemaVersion string           `yaml:"schema_version"`
+	OutputDir     string           `yaml:"output_dir"`
+	Workers       int              `yaml:"workers"`
+	Seeds         []int64          `yaml:"seeds"`
+	Policies      []string         `yaml:"policies"`
+	Workloads     []Workload       `yaml:"workloads"`
+}
+
+type InferenceConfig struct {
+	Model    string `yaml:"model"`
+	Python   string `yaml:"python"`
+	Timeout  string `yaml:"timeout"`
+	Fallback string `yaml:"fallback"`
 }
 
 type Workload struct {
@@ -61,10 +70,24 @@ type CellRunner interface {
 	Run(context.Context, RunRecord, string) error
 }
 
-type CommandRunner struct{ Binary string }
+type CommandRunner struct {
+	Binary    string
+	Inference *InferenceConfig
+}
 
 func (r CommandRunner) Run(ctx context.Context, cell RunRecord, outputDir string) error {
-	command := exec.CommandContext(ctx, r.Binary, "run", "--config", cell.Config, "--policy", cell.Policy, "--seed", strconv.FormatInt(cell.Seed, 10), "--results-dir", outputDir)
+	args := []string{"run", "--config", cell.Config, "--policy", cell.Policy, "--seed", strconv.FormatInt(cell.Seed, 10), "--results-dir", outputDir}
+	if cell.Policy == "rl" {
+		if r.Inference == nil {
+			return errors.New("rl requires inference configuration")
+		}
+		args = append(args, "--model", r.Inference.Model, "--python", r.Inference.Python, "--inference-timeout", r.Inference.Timeout, "--fallback", r.Inference.Fallback)
+	}
+	command := exec.CommandContext(ctx, r.Binary, args...)
+	// Give scheduler-sim a chance to cancel inference and reap its worker before
+	// escalating to Kill. Interrupt is handled by the simulator's main context.
+	command.Cancel = func() error { return command.Process.Signal(os.Interrupt) }
+	command.WaitDelay = 5 * time.Second
 	command.Stdout = io.Discard
 	var stderr bytes.Buffer
 	command.Stderr = &stderr
@@ -100,6 +123,22 @@ func Load(path string) (Spec, error) {
 		return Spec{}, fmt.Errorf("%w: multiple YAML documents are not allowed", ErrInvalidSpec)
 	}
 	base := filepath.Dir(path)
+	if spec.Inference != nil {
+		if !filepath.IsAbs(spec.Inference.Model) {
+			spec.Inference.Model = filepath.Join(base, spec.Inference.Model)
+		}
+		if spec.Inference.Python == "" {
+			spec.Inference.Python = "python3"
+		} else if strings.Contains(spec.Inference.Python, string(filepath.Separator)) && !filepath.IsAbs(spec.Inference.Python) {
+			spec.Inference.Python = filepath.Join(base, spec.Inference.Python)
+		}
+		if spec.Inference.Timeout == "" {
+			spec.Inference.Timeout = "250ms"
+		}
+		if spec.Inference.Fallback == "" {
+			spec.Inference.Fallback = "bin-pack"
+		}
+	}
 	if !filepath.IsAbs(spec.OutputDir) {
 		spec.OutputDir = filepath.Clean(filepath.Join(base, spec.OutputDir))
 	}
@@ -138,6 +177,19 @@ func (s Spec) Validate() error {
 	}
 	allowedPolicies := map[string]bool{"first-fit": true, "round-robin": true, "random-fit": true, "least-loaded": true, "bin-pack": true}
 	for _, policy := range s.Policies {
+		if policy == "rl" {
+			if s.Inference == nil {
+				return fmt.Errorf("%w: rl requires inference configuration", ErrInvalidSpec)
+			}
+			budget, err := time.ParseDuration(s.Inference.Timeout)
+			if err != nil || budget <= 0 || !allowedPolicies[s.Inference.Fallback] || s.Inference.Python == "" {
+				return fmt.Errorf("%w: invalid inference settings", ErrInvalidSpec)
+			}
+			if _, err := os.Stat(filepath.Join(s.Inference.Model, "metadata.json")); err != nil {
+				return fmt.Errorf("%w: model metadata: %v", ErrInvalidSpec, err)
+			}
+			continue
+		}
 		if !allowedPolicies[policy] {
 			return fmt.Errorf("%w: unsupported policy %q", ErrInvalidSpec, policy)
 		}

@@ -156,3 +156,23 @@ func TestValidateRejectsInvalidMatrices(t *testing.T) {
 		})
 	}
 }
+
+func TestRLRequiresValidModelAndBudget(t *testing.T) {
+	spec := validSpec(t)
+	spec.Policies = []string{"rl", "bin-pack"}
+	if err := spec.Validate(); !errors.Is(err, ErrInvalidSpec) {
+		t.Fatalf("expected missing model error, got %v", err)
+	}
+	directory := t.TempDir()
+	if err := os.WriteFile(filepath.Join(directory, "metadata.json"), []byte("{}"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	spec.Inference = &InferenceConfig{Model: directory, Python: "python3", Timeout: "250ms", Fallback: "bin-pack"}
+	if err := spec.Validate(); err != nil {
+		t.Fatal(err)
+	}
+	spec.Inference.Timeout = "-1s"
+	if err := spec.Validate(); !errors.Is(err, ErrInvalidSpec) {
+		t.Fatalf("expected timeout validation, got %v", err)
+	}
+}
